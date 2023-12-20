@@ -1,0 +1,49 @@
+@keyframes blink {
+    0% {
+        opacity: .1;
+    }
+
+    20% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: .1;
+    }
+}
+
+.typing {
+    position: relative;
+}
+
+.dot {
+    content: '';
+    height: 10px;
+    width: 10px;
+    background: var(--chakra-colors-red-300);
+    border-radius: 50%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    display: inline-block;
+    animation-duration: 1.5s;
+    -webkit-animation-duration: 1.5s;
+    animation-fill-mode: both;
+    -webkit-animation-fill-mode: both;
+    animation-name: blink;
+    -webkit-animation-name: blink;
+    animation-iteration-count: infinite;
+    -webkit-animation-iteration-count: infinite;
+}
+
+#dot2 {
+    animation-delay: .2s;
+    -webkit-animation-delay: .2s;
+    margin-left: 15px;
+}
+
+#dot3 {
+    animation-delay: .4s;
+    -webkit-animation-delay: .4s;
+    margin-left: 30px;
+}

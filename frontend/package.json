@@ -1,0 +1,61 @@
+{
+  "name": "mistralchat-frontend",
+  "homepage": "https://chat.akash.network",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@chakra-ui/icons": "^2.1.1",
+    "@chakra-ui/react": "^2.8.1",
+    "@emotion/react": "^11.11.1",
+    "@emotion/styled": "^11.11.0",
+    "@testing-library/jest-dom": "^5.17.0",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^14.5.1",
+    "@trpc/client": "^10.44.1",
+    "@trpc/server": "^10.44.1",
+    "buffer": "^6.0.3",
+    "chakra-react-select": "^4.7.2",
+    "framer-motion": "^10.16.16",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-markdown": "^9.0.1",
+    "react-scripts": "5.0.1",
+    "react-syntax-highlighter": "^15.5.0",
+    "react-textarea-autosize": "^8.5.3",
+    "remark-gfm": "^4.0.0",
+    "sass": "^1.68.0",
+    "typescript": "^4.9.5",
+    "web-vitals": "^2.1.4",
+    "webpack-bundle-analyzer": "^4.9.1",
+    "ws": "^8.14.2",
+    "zod": "^3.22.4"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@types/jest": "^28.1.8",
+    "@types/node": "^12.20.55",
+    "@types/react": "^18.2.21",
+    "@types/react-dom": "^18.2.7",
+    "@types/react-syntax-highlighter": "^15.5.11"
+  }
+}
