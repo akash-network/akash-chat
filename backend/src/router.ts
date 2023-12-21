@@ -49,11 +49,14 @@ export const appRouter = t.router({
 
             const jsonResp = await response.json();
 
-            try {
-                db.increaseCounter();
-            } catch (err) {
-                console.error('DB Error:', err);
+            if (db) {
+                try {
+                    db.increaseCounter();
+                } catch (err) {
+                    console.error('DB Error:', err);
+                }
             }
+            
             return {
                 message: jsonResp.message.content,
             };
