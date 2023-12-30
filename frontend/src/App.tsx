@@ -27,7 +27,7 @@ export const App = () => {
 			<Container
 				maxW={'3xl'}>
 				<Flex w={'full'} justifyContent={'center'}>
-					<AkashChatLogo w={["15em", "24em", "31em", "40em"]} p={{ base: 4, md: 8, lg: 8 }} />
+					<AkashChatLogo w={["15em", "24em", "31em"]} p={{ base: 4, md: 8, lg: 8 }} />
 				</Flex>
 				<Stack direction={'column'}
 					spacing={3}

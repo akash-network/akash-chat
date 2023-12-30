@@ -31,10 +31,7 @@ export const appRouter = t.router({
                 },
             });
 
-            // works for now with only two models
-            const lbPath = input.model === 'mistral' ? 'mistral' : 'dolphin';
-
-            const response = await fetch(`${process.env.LB_URL}/${lbPath}/api/chat`, {
+            const response = await fetch(`${process.env.LB_URL}/${input.model}/api/chat`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
