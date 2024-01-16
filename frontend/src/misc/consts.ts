@@ -1,11 +1,11 @@
-export const version = 'v0.2.26'
+export const version = 'v0.2.27'
 export const defaultModel = 'nous-hermes2-mixtral'
 
 export const models = [
 	{
 		name: 'nous-hermes2-mixtral',
 		fullname: 'Nous Hermes 2 Mixtral 8x7B',
-		chatname: 'Nous Hermes 2 Mixtral',
+		chatname: 'Nous Hermes 2',
 		description: 'Nous Hermes 2 Mixtral 8x7B is trained on over 1,000,000 entries of primarily GPT-4 generated data, as well as other high quality data from open datasets across the AI landscape, achieving state of the art performance on a variety of tasks. This is the supervised fine-tuning (SFT) + direct preference optimization (DPO) version of Mixtral Hermes 2. ',
 		logo: 'nous-logo.png'
 	},
