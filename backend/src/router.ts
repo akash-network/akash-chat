@@ -9,7 +9,7 @@ export const appRouter = t.router({
     generate: t.procedure
         .input(
             z.object({
-                model: z.string().refine((val) => val === 'mistral' || val === 'dolphin-mixtral' || val === 'mixtral'),
+                model: z.string().refine((val) => val === 'mistral' || val === 'dolphin-mixtral' || val === 'mixtral' || val === 'nous-hermes2-mixtral'),
                 messages: z.array(z.object({ role: z.enum(['user', 'assistant']), content: z.string().max(2000) })).max(5).min(1),
                 temperature: z.string().max(4).transform((val) => parseFloat(val)).refine((val) => val >= 0 && val <= 1),
                 max_tokens: z.number().min(64).max(1024).refine((val) => val % 64 === 0),
