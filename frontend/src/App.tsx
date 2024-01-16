@@ -14,13 +14,13 @@ import Footer from "./components/footer";
 import { Chat } from "./components/chat/Chat"
 import { Select } from "chakra-react-select";
 import { AkashChatLogo } from "./components/logos/akash-chat-logo"
-import { modelOptions, models } from "./misc/consts"
+import { defaultModel, modelOptions, models } from "./misc/consts"
 import { themeExtended } from './misc/styles';
 
 
 
 export const App = () => {
-	const [model, setModel] = useState('mistral')
+	const [model, setModel] = useState(defaultModel)
 
 	return (
 		<ChakraProvider theme={themeExtended}>
