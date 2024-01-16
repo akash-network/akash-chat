@@ -14,20 +14,20 @@ import Footer from "./components/footer";
 import { Chat } from "./components/chat/Chat"
 import { Select } from "chakra-react-select";
 import { AkashChatLogo } from "./components/logos/akash-chat-logo"
-import { modelOptions, models } from "./misc/consts"
+import { defaultModel, modelOptions, models } from "./misc/consts"
 import { themeExtended } from './misc/styles';
 
 
 
 export const App = () => {
-	const [model, setModel] = useState('mistral')
+	const [model, setModel] = useState(defaultModel)
 
 	return (
 		<ChakraProvider theme={themeExtended}>
 			<Container
 				maxW={'3xl'}>
 				<Flex w={'full'} justifyContent={'center'}>
-					<AkashChatLogo w={["15em", "24em", "31em", "40em"]} p={{ base: 4, md: 8, lg: 8 }} />
+					<AkashChatLogo w={["15em", "24em", "31em"]} p={{ base: 4, md: 8, lg: 8 }} />
 				</Flex>
 				<Stack direction={'column'}
 					spacing={3}

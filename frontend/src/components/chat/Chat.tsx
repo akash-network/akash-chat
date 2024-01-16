@@ -76,6 +76,7 @@ export const Chat = ({ modelInfo }: { modelInfo: { name: string, fullname: strin
 
     const handleClear = () => {
         setMessages([]);
+        localStorage.setItem("messages", JSON.stringify([]));
     }
 
     const handleUndo = () => {

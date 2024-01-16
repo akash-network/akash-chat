@@ -33,7 +33,7 @@ export const ChatMessages = ({ messages }: ChatMessagesProps) => {
                         <Flex key={index} w="100%">
                             <Avatar
                                 bg="#F0F0F0"
-                                p="2.5"
+                                p="3"
                                 icon={<AkashLogoRed />}
                             ></Avatar>
                             <Box
@@ -102,8 +102,8 @@ export const ChatMessages = ({ messages }: ChatMessagesProps) => {
                             <Flex key={index} w="100%">
                                 <Avatar
                                     name={models.find((model) => { return model.name === el.model })?.chatname ?? "Mistral 7B"}
-                                    src="/mistral-logo.png"
-                                    p={"6px"}
+                                    src={models.find((model) => { return model.name === el.model })?.logo ?? "/mistral-logo.png"}
+                                    p={"9px"}
                                     bg="#F0F0F0"
                                 ></Avatar>
                                 <Box
@@ -123,8 +123,8 @@ export const ChatMessages = ({ messages }: ChatMessagesProps) => {
                             <Flex key={index} w="100%">
                                 <Avatar
                                     name={models.find((model) => { return model.name === el.model })?.chatname ?? "Mistral 7B"}
-                                    src="/mistral-logo.png"
-                                    p={"6px"}
+                                    src={models.find((model) => { return model.name === el.model })?.logo ?? "/mistral-logo.png"}
+                                    p={"9px"}
                                     bg="#F0F0F0"
                                 ></Avatar>
                                 <Box
