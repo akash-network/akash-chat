@@ -1,4 +1,4 @@
-export const version = 'v0.2.24'
+export const version = 'v0.2.25'
 
 export const models = [
 	{
