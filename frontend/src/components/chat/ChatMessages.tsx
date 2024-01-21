@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Avatar, Box, Button, Flex, Heading, Tooltip, useClipboard } from "@chakra-ui/react";
+import { Avatar, Box, Button, Flex, Heading, Hide, Tooltip, useClipboard } from "@chakra-ui/react";
 import { Typing } from "./Typing";
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -31,17 +31,20 @@ export const ChatMessages = ({ messages }: ChatMessagesProps) => {
                 if (el.role === "user") {
                     return (
                         <Flex key={index} w="100%">
-                            <Avatar
-                                bg="#F0F0F0"
-                                p="3"
-                                icon={<AkashLogoRed />}
-                            ></Avatar>
+                            <Hide below='md'>
+                                <Avatar
+                                    bg="#F0F0F0"
+                                    p="3"
+                                    icon={<AkashLogoRed />}
+                                ></Avatar>
+                            </Hide>
                             <Box
                                 borderRadius="lg"
                                 bg="#F0F0F0"
                                 my="1"
                                 mx="1"
                                 p="5"
+                                color={'gray.500'}
                             >
                                 <Heading as='h5' size='sm'>You</Heading>
                                 <Markdown
@@ -100,12 +103,14 @@ export const ChatMessages = ({ messages }: ChatMessagesProps) => {
                     if (el.content === "loading...") {
                         return (
                             <Flex key={index} w="100%">
-                                <Avatar
-                                    name={models.find((model) => { return model.name === el.model })?.chatname ?? "Mistral 7B"}
-                                    src={models.find((model) => { return model.name === el.model })?.logo ?? "/mistral-logo.png"}
-                                    p={"9px"}
-                                    bg="#F0F0F0"
-                                ></Avatar>
+                                <Hide below='md'>
+                                    <Avatar
+                                        name={models.find((model) => { return model.name === el.model })?.chatname ?? "Mistral 7B"}
+                                        src={models.find((model) => { return model.name === el.model })?.logo ?? "/mistral-logo.png"}
+                                        p={"9px"}
+                                        bg="#F0F0F0"
+                                    ></Avatar>
+                                </Hide>
                                 <Box
                                     borderRadius="lg"
                                     bg="#F0F0F0"
@@ -121,12 +126,14 @@ export const ChatMessages = ({ messages }: ChatMessagesProps) => {
                     } else {
                         return (
                             <Flex key={index} w="100%">
-                                <Avatar
-                                    name={models.find((model) => { return model.name === el.model })?.chatname ?? "Mistral 7B"}
-                                    src={models.find((model) => { return model.name === el.model })?.logo ?? "/mistral-logo.png"}
-                                    p={"9px"}
-                                    bg="#F0F0F0"
-                                ></Avatar>
+                                <Hide below='md'>
+                                    <Avatar
+                                        name={models.find((model) => { return model.name === el.model })?.chatname ?? "Mistral 7B"}
+                                        src={models.find((model) => { return model.name === el.model })?.logo ?? "/mistral-logo.png"}
+                                        p={"9px"}
+                                        bg="#F0F0F0"
+                                    ></Avatar>
+                                </Hide>
                                 <Box
                                     borderRadius="lg"
                                     bg="#F0F0F0"
