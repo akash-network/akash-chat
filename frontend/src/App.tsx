@@ -1,4 +1,4 @@
-import './scss/fonts.scss'
+import './css/app.css'
 import {
 	Box,
 	Flex,

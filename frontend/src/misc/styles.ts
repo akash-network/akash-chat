@@ -7,7 +7,7 @@ const { definePartsStyle, defineMultiStyleConfig } = createMultiStyleConfigHelpe
 const baseStyle = definePartsStyle({
 	// define the part you're going to style
 	field: {
-		fontFamily: `'Satoshi', normal`,
+		fontFamily: `'Inter', normal`,
 		background: '#ffbaba'
 	},
 	icon: {
@@ -20,8 +20,8 @@ const selectTheme = defineMultiStyleConfig({ baseStyle })
 export const themeExtended = extendTheme({
 	useSystemColorMode: false,
 	fonts: {
-		heading: `'Satoshi', normal`,
-		body: `'Satoshi', normal`
+		heading: `'Inter', normal`,
+		body: `'Inter', normal`
 	},
 	components: {
 		Select: selectTheme,
