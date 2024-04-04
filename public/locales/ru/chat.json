@@ -1,0 +1,21 @@
+{
+  "Stop Generating": "Прекратить",
+  "Prompt limit is {{maxLength}} characters": "Лимит сообщения на символы: {{maxLength}} символов",
+  "System Prompt": "Системное сообщение",
+  "Enter a prompt": "Введите сообщение",
+  "Regenerate response": "Перегенерировать сообщение",
+  "Sorry, there was an error.": "Просим прощения, произошла ошибка",
+  "Model": "Модель",
+  "Conversation": "Чат",
+  "OR": "ИЛИ",
+  "Loading...": "Пожалуйста подождите...",
+  "Error fetching models.": "Ошибка при получении списка моделей",
+  "AI": "Бот",
+  "You": "Вы",
+  "Cancel": "Отмена",
+  "Save & Submit": "Отредактировать",
+  "click if using a .env.local file": "click if using a .env.local file",
+  "Message limit is {{maxLength}} characters. You have entered {{valueLength}} characters.": "Лимит сообщения: {{maxLength}} символов. Вы ввели {{valueLength}} символов.",
+  "Please enter a message": "Пожалуйста введите сообщение",
+  "Are you sure you want to clear all messages?": "Вы уверены, что хотите удалить все сообщения?"
+}

@@ -1,0 +1,21 @@
+{
+  "Stop Generating": "עצור תהליך הפקת התשובה",
+  "Prompt limit is {{maxLength}} characters": "אורך התשובה מוגבל ל {{maxLength}} תווים",
+  "System Prompt": "הגדרת בסיס לכל תשובה של המערכת",
+  "Enter a prompt": "הקלד הודעה",
+  "Regenerate response": "הפק תשובה מחדש",
+  "Sorry, there was an error.": "התנצלותנו הכנה, המערכת מדווחת על תקלה",
+  "Model": "מודל",
+  "Conversation": "שיחה",
+  "OR": "או",
+  "Loading...": "טוען...",
+  "Error fetching models.": "תקלה באיחזור רשימת המודלים",
+  "AI": "המערכת",
+  "You": "אתה",
+  "Cancel": "Cancel",
+  "Save & Submit": "Save & Submit",
+  "click if using a .env.local file": "click if using a .env.local file",
+  "Message limit is {{maxLength}} characters. You have entered {{valueLength}} characters.": "מגבלת תווים היא {{maxLength}}. אתה הקלדת עד עכשיו {{valueLength}} תווים.",
+  "Please enter a message": "הקלד את הודעתך",
+  "Are you sure you want to clear all messages?": "האם אתה בטוח שברצונך למחוק את כל ההודעות?"
+}

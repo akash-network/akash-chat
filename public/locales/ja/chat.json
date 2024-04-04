@@ -1,0 +1,21 @@
+{
+  "Stop Generating": "回答をストップ",
+  "Prompt limit is {{maxLength}} characters": "プロンプトの文字数は{{maxLength}}文字までです",
+  "System Prompt": "システムのプロンプト",
+  "Enter a prompt": "プロンプトを入力してください",
+  "Regenerate response": "もう一度回答する",
+  "Sorry, there was an error.": "すみません、エラーが発生しました。",
+  "Model": "モデル",
+  "Conversation": "会話",
+  "OR": "または",
+  "Loading...": "読み込み中...",
+  "Error fetching models.": "モデルの取得中にエラーが発生しました。",
+  "AI": "AI",
+  "You": "あなた",
+  "Cancel": "Cancel",
+  "Save & Submit": "Save & Submit",
+  "click if using a .env.local file": "もし.env.localファイルを使用している場合はこちらをクリックしてください",
+  "Message limit is {{maxLength}} characters. You have entered {{valueLength}} characters.": "メッセージの文字数は{{maxLength}}文字までです。あなたは{{valueLength}}文字を入力しました。",
+  "Please enter a message": "メッセージを入力してください",
+  "Are you sure you want to clear all messages?": "すべてのメッセージを削除してもよろしいですか？"
+}

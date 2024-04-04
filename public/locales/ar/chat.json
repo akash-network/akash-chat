@@ -1,0 +1,30 @@
+{
+  "Stop Generating": "إيقاف التوليد",
+  "Prompt limit is {{maxLength}} characters": "حرفًا {{maxLength}} حد المطالبة هو",
+  "System Prompt": "مطالبة النظام",
+  "Enter a prompt": "أدخل المطالبة",
+  "Regenerate response": "إعادة توليد الرد",
+  "Sorry, there was an error.": "عذرًا، حدث خطأ",
+  "Model": "النموذج",
+  "Conversation": "المحادثة",
+  "OR": "أو",
+  "Loading...": "...جاري التحميل",
+  "Error fetching models.": "خطأ في جلب النماذج",
+  "AI": "الذكاء الاصطناعي",
+  "You": "أنت",
+  "Cancel": "Cancel",
+  "Save & Submit": "Save & Submit",
+
+  "click if using a .env.local file": ".env.local انقر إذا كنت تستخدم ملف",
+
+  
+  "Message limit is {{maxLength}} characters. You have entered {{valueLength}} characters.": "حرفًا {{maxLength}}  حد الرسالة هو {{valueLength}} لقد أدخلت ",
+
+ 
+
+  
+  
+  
+  "Please enter a message": "يرجى إدخال رسالة",
+  "Are you sure you want to clear all messages?": "هل أنت متأكد أنك تريد مسح كافة الرسائل؟"
+}
