@@ -1,13 +1,13 @@
-import { OpenAIModel, OpenAIModelID } from '@/types/openai';
+import { LLM, LLMID } from '@/types/openai';
 import { useTranslation } from 'next-i18next';
 import { IconExternalLink } from '@tabler/icons-react';
 import { FC } from 'react';
 
 interface Props {
-  model: OpenAIModel;
-  models: OpenAIModel[];
-  defaultModelId: OpenAIModelID;
-  onModelChange: (model: OpenAIModel) => void;
+  model: LLM;
+  models: LLM[];
+  defaultModelId: LLMID;
+  onModelChange: (model: LLM) => void;
 }
 
 export const ModelSelect: FC<Props> = ({
@@ -30,9 +30,7 @@ export const ModelSelect: FC<Props> = ({
           value={model?.id || defaultModelId}
           onChange={(e) => {
             onModelChange(
-              models.find(
-                (model) => model.id === e.target.value,
-              ) as OpenAIModel,
+              models.find((model) => model.id === e.target.value) as LLM,
             );
           }}
         >

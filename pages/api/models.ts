@@ -1,5 +1,5 @@
-import { OpenAIModel, OpenAIModelID, OpenAIModels } from '@/types/openai';
-import { OPENAI_API_HOST } from '@/utils/app/const';
+import { LLM, LLMID, LLMS } from '@/types/openai';
+import { API_HOST } from '@/utils/app/const';
 
 export const config = {
   runtime: 'edge',
@@ -11,13 +11,10 @@ const handler = async (req: Request): Promise<Response> => {
       key: string;
     };
 
-    const response = await fetch(`${OPENAI_API_HOST}/v1/models`, {
+    const response = await fetch(`${API_HOST}/v1/models`, {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${key ? key : process.env.OPENAI_API_KEY}`,
-        ...(process.env.OPENAI_ORGANIZATION && {
-          'OpenAI-Organization': process.env.OPENAI_ORGANIZATION,
-        })
+        Authorization: `Bearer ${key ? key : process.env.API_KEY}`,
       },
     });
 
@@ -33,19 +30,19 @@ const handler = async (req: Request): Promise<Response> => {
         }: ${await response.text()}`,
       );
       console.log(response);
-      
+
       throw new Error('OpenAI API returned an error');
     }
 
     const json = await response.json();
 
-    const models: OpenAIModel[] = json.data
+    const models: LLM[] = json.data
       .map((model: any) => {
-        for (const [key, value] of Object.entries(OpenAIModelID)) {
+        for (const [key, value] of Object.entries(LLMID)) {
           if (value === model.id) {
             return {
               id: model.id,
-              name: OpenAIModels[value].name,
+              name: LLMS[value].name,
             };
           }
         }

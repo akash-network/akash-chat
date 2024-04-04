@@ -1,4 +1,4 @@
- # AkashChat V2 - Advanced Chatbot UI
+# AkashChat V2 - Advanced Chatbot UI
 
 AkashChat V2 is an enhanced chatbot interface based on [Chatbot UI Lite](https://github.com/mckaywrigley/chatbot-ui-lite) a next-generation chatbot interface utilizing Next.js, TypeScript, and Tailwind CSS.
 
@@ -24,18 +24,18 @@ git clone https://github.com/akash-network/akash-chat.git
 npm i
 ```
 
-**3. Provide OpenAI API compatible Endpoint**
+**3. Provide API Endpoint**
 
 Create a .env.local file in the root of the repo.
 
 ```bash
 DEFAULT_MODEL=mistral
 DEFAULT_SYSTEM_PROMPT=You are a helpful and friendly assistant. Follow the user's instructions carefully. Don't use emojis or slang. Provide accurate and helpful information.
-OPENAI_API_KEY=yourkey
-OPENAI_API_HOST=youropenaiapicompatibleendpoint
+API_KEY=yourkey
+API_HOST=yourollamaendpoint
 ```
 
-> OPENAI_API_HOST is the endpoint of your OpenAI API compatible endpoint like a Ollama deployment
+> API_HOST is the endpoint of your compatible endpoint like a Ollama deployment
 > See `/types/openai.ts` how to add additional models.
 
 **4. Run App**

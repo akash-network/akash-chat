@@ -17,14 +17,8 @@
 
   "click if using a .env.local file": ".env.local انقر إذا كنت تستخدم ملف",
 
-  
   "Message limit is {{maxLength}} characters. You have entered {{valueLength}} characters.": "حرفًا {{maxLength}}  حد الرسالة هو {{valueLength}} لقد أدخلت ",
 
- 
-
-  
-  
-  
   "Please enter a message": "يرجى إدخال رسالة",
   "Are you sure you want to clear all messages?": "هل أنت متأكد أنك تريد مسح كافة الرسائل؟"
 }
