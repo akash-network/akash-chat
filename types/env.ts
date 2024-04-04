@@ -1,5 +1,5 @@
 export interface ProcessEnv {
-  OPENAI_API_KEY: string;
-  OPENAI_API_HOST?: string;
+  API_KEY: string;
+  API_HOST?: string;
   OPENAI_ORGANIZATION?: string;
 }

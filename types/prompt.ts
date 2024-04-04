@@ -1,10 +1,10 @@
-import { OpenAIModel } from './openai';
+import { LLM } from './llms';
 
 export interface Prompt {
   id: string;
   name: string;
   description: string;
   content: string;
-  model: OpenAIModel;
+  model: LLM;
   folderId: string | null;
 }

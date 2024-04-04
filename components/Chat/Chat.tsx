@@ -1,7 +1,7 @@
 import { Conversation, Message } from '@/types/chat';
 import { KeyValuePair } from '@/types/data';
 import { ErrorMessage } from '@/types/error';
-import { OpenAIModel, OpenAIModelID } from '@/types/openai';
+import { LLM, LLMID } from '@/types/llms';
 import { Plugin } from '@/types/plugin';
 import { Prompt } from '@/types/prompt';
 import { throttle } from '@/utils';
@@ -27,10 +27,10 @@ import { AkashChatLogo } from '../Logos/akash-chat-logo';
 
 interface Props {
   conversation: Conversation;
-  models: OpenAIModel[];
+  models: LLM[];
   apiKey: string;
   serverSideApiKeyIsSet: boolean;
-  defaultModelId: OpenAIModelID;
+  defaultModelId: LLMID;
   messageIsStreaming: boolean;
   modelError: ErrorMessage | null;
   loading: boolean;
@@ -174,7 +174,7 @@ export const Chat: FC<Props> = memo(
                         </div>
                       ) : (
                         <div className="flex items-center justify-center space-x-5 border-b border-neutral-300 py-2 text-sm text-neutral-500 dark:border-none dark:text-neutral-200">
-                          <div className='md:max-w-2xl md:gap-6 md:py-6 lg:max-w-2xl lg:px-0 xl:max-w-3xl'>
+                          <div className="md:max-w-2xl md:gap-6 md:py-6 lg:max-w-2xl lg:px-0 xl:max-w-3xl">
                             <AkashChatLogo />
                           </div>
                         </div>
@@ -212,7 +212,7 @@ export const Chat: FC<Props> = memo(
               ) : (
                 <>
                   <div className="flex items-center justify-center space-x-5 border-b border-neutral-300 bg-neutral-100 py-2 text-sm text-neutral-500 dark:border-none dark:bg-[#333d3d3d] dark:text-neutral-200">
-                    <div className='md:max-w-2xl md:gap-6 md:py-6 lg:max-w-2xl lg:px-0 xl:max-w-3xl'>
+                    <div className="md:max-w-2xl md:gap-6 md:py-6 lg:max-w-2xl lg:px-0 xl:max-w-3xl">
                       <AkashChatLogo />
                     </div>
                   </div>

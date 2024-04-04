@@ -2,7 +2,6 @@ import { Conversation } from '@/types/chat';
 import { KeyValuePair } from '@/types/data';
 import { SupportedExportFormats } from '@/types/export';
 import { Folder } from '@/types/folder';
-import { PluginKey } from '@/types/plugin';
 import { IconFolderPlus, IconMessagesOff, IconPlus } from '@tabler/icons-react';
 import { useTranslation } from 'next-i18next';
 import { FC, useEffect, useState } from 'react';
@@ -17,7 +16,6 @@ interface Props {
   lightMode: 'light' | 'dark';
   selectedConversation: Conversation;
   apiKey: string;
-  pluginKeys: PluginKey[];
   folders: Folder[];
   onCreateFolder: (name: string) => void;
   onDeleteFolder: (folderId: string) => void;
@@ -34,8 +32,6 @@ interface Props {
   onClearConversations: () => void;
   onExportConversations: () => void;
   onImportConversations: (data: SupportedExportFormats) => void;
-  onPluginKeyChange: (pluginKey: PluginKey) => void;
-  onClearPluginKey: (pluginKey: PluginKey) => void;
 }
 
 export const Chatbar: FC<Props> = ({
@@ -44,7 +40,6 @@ export const Chatbar: FC<Props> = ({
   lightMode,
   selectedConversation,
   apiKey,
-  pluginKeys,
   folders,
   onCreateFolder,
   onDeleteFolder,
@@ -58,8 +53,6 @@ export const Chatbar: FC<Props> = ({
   onClearConversations,
   onExportConversations,
   onImportConversations,
-  onPluginKeyChange,
-  onClearPluginKey,
 }) => {
   const { t } = useTranslation('sidebar');
   const [searchTerm, setSearchTerm] = useState<string>('');
@@ -198,15 +191,12 @@ export const Chatbar: FC<Props> = ({
       <ChatbarSettings
         lightMode={lightMode}
         apiKey={apiKey}
-        pluginKeys={pluginKeys}
         conversationsCount={conversations.length}
         onToggleLightMode={onToggleLightMode}
         onApiKeyChange={onApiKeyChange}
         onClearConversations={onClearConversations}
         onExportConversations={onExportConversations}
         onImportConversations={onImportConversations}
-        onPluginKeyChange={onPluginKeyChange}
-        onClearPluginKey={onClearPluginKey}
       />
     </div>
   );

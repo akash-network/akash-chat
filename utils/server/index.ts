@@ -1,11 +1,11 @@
 import { Message } from '@/types/chat';
-import { OpenAIModel } from '@/types/openai';
+import { LLM } from '@/types/llms';
 import {
   createParser,
   ParsedEvent,
   ReconnectInterval,
 } from 'eventsource-parser';
-import { OPENAI_API_HOST } from '../app/const';
+import { API_HOST } from '../app/const';
 
 export class OpenAIError extends Error {
   type: string;
@@ -22,21 +22,19 @@ export class OpenAIError extends Error {
 }
 
 export const OpenAIStream = async (
-  model: OpenAIModel,
+  model: LLM,
   systemPrompt: string,
   key: string,
   messages: Message[],
 ) => {
-  const res = await fetch(`${OPENAI_API_HOST}/v1/chat/completions`, {
+  const res = await fetch(`${API_HOST}/v1/chat/completions`, {
     headers: {
       'Content-Type': 'application/json',
     },
     method: 'POST',
     body: JSON.stringify({
       model: model.id,
-      messages: [
-        ...messages,
-      ],
+      messages: [...messages],
       max_tokens: 512,
       temperature: 1,
       stream: true,
@@ -57,7 +55,7 @@ export const OpenAIStream = async (
       );
     } else {
       console.log(res);
-      
+
       throw new Error(
         `OpenAI API returned an error: ${
           decoder.decode(result?.message) || result.statusText

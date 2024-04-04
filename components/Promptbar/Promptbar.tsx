@@ -1,10 +1,6 @@
 import { Folder } from '@/types/folder';
 import { Prompt } from '@/types/prompt';
-import {
-  IconFolderPlus,
-  IconMistOff,
-  IconPlus,
-} from '@tabler/icons-react';
+import { IconFolderPlus, IconMistOff, IconPlus } from '@tabler/icons-react';
 import { FC, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { PromptFolders } from '../Folders/Prompt/PromptFolders';
@@ -109,7 +105,7 @@ export const Promptbar: FC<Props> = ({
         </button>
 
         <button
-          className="flex items-center flex-shrink-0 gap-3 p-3 ml-2 text-sm text-white transition-colors duration-200 border rounded-md cursor-pointer border-white/20 hover:bg-gray-500/10"
+          className="ml-2 flex flex-shrink-0 cursor-pointer items-center gap-3 rounded-md border border-white/20 p-3 text-sm text-white transition-colors duration-200 hover:bg-gray-500/10"
           onClick={() => onCreateFolder(t('New folder'))}
         >
           <IconFolderPlus size={16} />
@@ -126,7 +122,7 @@ export const Promptbar: FC<Props> = ({
 
       <div className="flex-grow overflow-auto">
         {folders.length > 0 && (
-          <div className="flex pb-2 border-b border-white/20">
+          <div className="flex border-b border-white/20 pb-2">
             <PromptFolders
               searchTerm={searchTerm}
               prompts={filteredPrompts}
@@ -155,7 +151,7 @@ export const Promptbar: FC<Props> = ({
             />
           </div>
         ) : (
-          <div className="mt-8 text-center text-white opacity-50 select-none">
+          <div className="mt-8 select-none text-center text-white opacity-50">
             <IconMistOff className="mx-auto mb-3" />
             <span className="text-[14px] leading-normal">
               {t('No prompts.')}

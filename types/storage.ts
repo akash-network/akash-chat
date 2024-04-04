@@ -1,6 +1,5 @@
 import { Conversation } from './chat';
 import { Folder } from './folder';
-import { PluginKey } from './plugin';
 import { Prompt } from './prompt';
 
 // keep track of local storage schema
@@ -17,5 +16,4 @@ export interface LocalStorage {
   showChatbar: boolean;
   showPromptbar: boolean;
   // added plugin keys (4/3/23)
-  pluginKeys: PluginKey[];
 }

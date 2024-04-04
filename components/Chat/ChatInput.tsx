@@ -1,17 +1,7 @@
 import { Message } from '@/types/chat';
-import { OpenAIModel } from '@/types/openai';
-import { Plugin } from '@/types/plugin';
+import { LLM } from '@/types/llms';
 import { Prompt } from '@/types/prompt';
-import {
-  IconArrowUp,
-  IconArrowUpSquare,
-  IconBolt,
-  IconBrandGoogle,
-  IconPlayerStop,
-  IconRepeat,
-  IconSend,
-  IconUpload,
-} from '@tabler/icons-react';
+import { IconArrowUp, IconPlayerStop, IconRepeat } from '@tabler/icons-react';
 import { useTranslation } from 'next-i18next';
 import {
   FC,
@@ -22,14 +12,13 @@ import {
   useRef,
   useState,
 } from 'react';
-import { PluginSelect } from './PluginSelect';
 import { PromptList } from './PromptList';
 import { VariableModal } from './VariableModal';
 import { Spinner } from '../Global/Spinner';
 
 interface Props {
   messageIsStreaming: boolean;
-  model: OpenAIModel;
+  model: LLM;
   conversationIsEmpty: boolean;
   prompts: Prompt[];
   onSend: (message: Message, plugin: Plugin | null) => void;
@@ -57,8 +46,6 @@ export const ChatInput: FC<Props> = ({
   const [promptInputValue, setPromptInputValue] = useState('');
   const [variables, setVariables] = useState<string[]>([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [showPluginSelect, setShowPluginSelect] = useState(false);
-  const [plugin, setPlugin] = useState<Plugin | null>(null);
 
   const promptListRef = useRef<HTMLUListElement | null>(null);
 
@@ -94,9 +81,8 @@ export const ChatInput: FC<Props> = ({
       return;
     }
 
-    onSend({ role: 'user', content }, plugin);
+    onSend({ role: 'user', content }, null);
     setContent('');
-    setPlugin(null);
 
     if (window.innerWidth < 640 && textareaRef && textareaRef.current) {
       textareaRef.current.blur();
@@ -162,9 +148,6 @@ export const ChatInput: FC<Props> = ({
     } else if (e.key === 'Enter' && !isTyping && !isMobile() && !e.shiftKey) {
       e.preventDefault();
       handleSend();
-    } else if (e.key === '/' && e.metaKey) {
-      e.preventDefault();
-      setShowPluginSelect(!showPluginSelect);
     }
   };
 
@@ -230,8 +213,9 @@ export const ChatInput: FC<Props> = ({
     if (textareaRef && textareaRef.current) {
       textareaRef.current.style.height = 'inherit';
       textareaRef.current.style.height = `${textareaRef.current?.scrollHeight}px`;
-      textareaRef.current.style.overflow = `${textareaRef?.current?.scrollHeight > 400 ? 'auto' : 'hidden'
-        }`;
+      textareaRef.current.style.overflow = `${
+        textareaRef?.current?.scrollHeight > 400 ? 'auto' : 'hidden'
+      }`;
     }
   }, [content]);
 
@@ -274,22 +258,20 @@ export const ChatInput: FC<Props> = ({
         )}
 
         <div className="relative mx-2 flex w-full flex-grow flex-col rounded-md border border-black/10 bg-white shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:border-gray-500/50 dark:bg-[#1c1c1c] dark:text-white dark:shadow-[0_0_15px_rgba(0,0,0,0.10)] sm:mx-4">
-
           <textarea
             ref={textareaRef}
-            className="m-0 w-full resize-none border-0 bg-transparent p-0 py-2 pr-8 pl-4 text-black dark:bg-transparent dark:text-white md:py-3 md:pl-4 focus:outline-none"
+            className="m-0 w-full resize-none border-0 bg-transparent p-0 py-2 pr-8 pl-4 text-black focus:outline-none dark:bg-transparent dark:text-white md:py-3 md:pl-4"
             style={{
               resize: 'none',
               bottom: `${textareaRef?.current?.scrollHeight}px`,
               maxHeight: '400px',
-              overflow: `${textareaRef.current && textareaRef.current.scrollHeight > 400
+              overflow: `${
+                textareaRef.current && textareaRef.current.scrollHeight > 400
                   ? 'auto'
                   : 'hidden'
-                }`,
+              }`,
             }}
-            placeholder={
-              'Message AkashChat...'
-            }
+            placeholder={'Message AkashChat...'}
             value={content}
             rows={1}
             onCompositionStart={() => setIsTyping(true)}
@@ -299,14 +281,14 @@ export const ChatInput: FC<Props> = ({
           />
 
           <button
-            className={`absolute right-2 mt-1 mb-1 rounded-lg border p-0.5 disabled:opacity-20 dark:enabled:bg-white dark:disabled:bg-white dark:disabled:border-white bg-black`}
+            className={`absolute right-2 mt-1 mb-1 rounded-lg border bg-black p-0.5 disabled:opacity-20 dark:enabled:bg-white dark:disabled:border-white dark:disabled:bg-white`}
             onClick={handleSend}
             disabled={content?.trim().length === 0 || messageIsStreaming}
           >
             {messageIsStreaming ? (
-              <Spinner size='20' className='dark:text-black text-white'/>
+              <Spinner size="20" className="text-white dark:text-black" />
             ) : (
-              <IconArrowUp size={20} className='dark:text-black text-white' />
+              <IconArrowUp size={20} className="text-white dark:text-black" />
             )}
           </button>
 

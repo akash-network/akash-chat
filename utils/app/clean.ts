@@ -1,5 +1,5 @@
 import { Conversation } from '@/types/chat';
-import { OpenAIModelID, OpenAIModels } from '@/types/openai';
+import { LLMID, LLMS } from '@/types/llms';
 import { DEFAULT_SYSTEM_PROMPT } from './const';
 
 export const cleanSelectedConversation = (conversation: Conversation) => {
@@ -14,7 +14,7 @@ export const cleanSelectedConversation = (conversation: Conversation) => {
   if (!updatedConversation.model) {
     updatedConversation = {
       ...updatedConversation,
-      model: updatedConversation.model || OpenAIModels[OpenAIModelID.MISTRAL],
+      model: updatedConversation.model || LLMS[LLMID.MISTRAL],
     };
   }
 
@@ -50,7 +50,7 @@ export const cleanConversationHistory = (history: any[]): Conversation[] => {
   return history.reduce((acc: any[], conversation) => {
     try {
       if (!conversation.model) {
-        conversation.model = OpenAIModels[OpenAIModelID.MISTRAL];
+        conversation.model = LLMS[LLMID.MISTRAL];
       }
 
       if (!conversation.prompt) {

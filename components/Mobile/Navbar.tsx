@@ -12,7 +12,7 @@ export const Navbar: FC<Props> = ({
   onNewConversation,
 }) => {
   return (
-    <nav className="flex w-full justify-between bg-[#242424] py-3 px-4 z-10">
+    <nav className="z-10 flex w-full justify-between bg-[#242424] py-3 px-4">
       <div className="mr-4"></div>
 
       {/*hide temporary
@@ -21,7 +21,7 @@ export const Navbar: FC<Props> = ({
   </div>*/}
 
       <IconPlus
-        className="cursor-pointer hover:text-neutral-400 mr-8"
+        className="mr-8 cursor-pointer hover:text-neutral-400"
         onClick={onNewConversation}
       />
     </nav>

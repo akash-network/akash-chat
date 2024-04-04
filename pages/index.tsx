@@ -8,13 +8,7 @@ import { KeyValuePair } from '@/types/data';
 import { ErrorMessage } from '@/types/error';
 import { LatestExportFormat, SupportedExportFormats } from '@/types/export';
 import { Folder, FolderType } from '@/types/folder';
-import {
-  OpenAIModel,
-  OpenAIModelID,
-  OpenAIModels,
-  fallbackModelID,
-} from '@/types/openai';
-import { Plugin, PluginKey } from '@/types/plugin';
+import { LLM, LLMID, LLMS, fallbackModelID } from '@/types/llms';
 import { Prompt } from '@/types/prompt';
 import { getEndpoint } from '@/utils/app/api';
 import {
@@ -41,13 +35,11 @@ import { v4 as uuidv4 } from 'uuid';
 
 interface HomeProps {
   serverSideApiKeyIsSet: boolean;
-  serverSidePluginKeysSet: boolean;
-  defaultModelId: OpenAIModelID;
+  defaultModelId: LLMID;
 }
 
 const Home: React.FC<HomeProps> = ({
   serverSideApiKeyIsSet,
-  serverSidePluginKeysSet,
   defaultModelId,
 }) => {
   const { t } = useTranslation('chat');
@@ -55,14 +47,13 @@ const Home: React.FC<HomeProps> = ({
   // STATE ----------------------------------------------
 
   const [apiKey, setApiKey] = useState<string>('');
-  const [pluginKeys, setPluginKeys] = useState<PluginKey[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [lightMode, setLightMode] = useState<'dark' | 'light'>('light');
   const [messageIsStreaming, setMessageIsStreaming] = useState<boolean>(false);
 
   const [modelError, setModelError] = useState<ErrorMessage | null>(null);
 
-  const [models, setModels] = useState<OpenAIModel[]>([]);
+  const [models, setModels] = useState<LLM[]>([]);
 
   const [folders, setFolders] = useState<Folder[]>([]);
 
@@ -119,21 +110,7 @@ const Home: React.FC<HomeProps> = ({
       };
 
       const endpoint = getEndpoint(plugin);
-      let body;
-
-      if (!plugin) {
-        body = JSON.stringify(chatBody);
-      } else {
-        body = JSON.stringify({
-          ...chatBody,
-          googleAPIKey: pluginKeys
-            .find((key) => key.pluginId === 'google-search')
-            ?.requiredKeys.find((key) => key.key === 'GOOGLE_API_KEY')?.value,
-          googleCSEId: pluginKeys
-            .find((key) => key.pluginId === 'google-search')
-            ?.requiredKeys.find((key) => key.key === 'GOOGLE_CSE_ID')?.value,
-        });
-      }
+      let body = JSON.stringify(chatBody);
 
       const controller = new AbortController();
       const response = await fetch(endpoint, {
@@ -293,9 +270,7 @@ const Home: React.FC<HomeProps> = ({
     const error = {
       title: t('Error fetching models.'),
       code: null,
-      messageLines: [
-        'There was an error fetching the models.',
-      ],
+      messageLines: ['There was an error fetching the models.'],
     } as ErrorMessage;
 
     const response = await fetch('/api/models', {
@@ -315,7 +290,7 @@ const Home: React.FC<HomeProps> = ({
           code: data.error?.code,
           messageLines: [data.error?.message],
         });
-      } catch (e) { }
+      } catch (e) {}
       setModelError(error);
       return;
     }
@@ -327,8 +302,13 @@ const Home: React.FC<HomeProps> = ({
       return;
     }
 
-    const modelOrder = ["mistral", "nous-hermes2-mixtral", "mixtral", "dolphin-mixtral"];
-    const sortedData = data.sort((a: OpenAIModel, b: OpenAIModel) => {
+    const modelOrder = [
+      'mistral',
+      'nous-hermes2-mixtral',
+      'mixtral',
+      'dolphin-mixtral',
+    ];
+    const sortedData = data.sort((a: LLM, b: LLM) => {
       return modelOrder.indexOf(a.id) - modelOrder.indexOf(b.id);
     });
 
@@ -346,45 +326,6 @@ const Home: React.FC<HomeProps> = ({
   const handleApiKeyChange = (apiKey: string) => {
     setApiKey(apiKey);
     localStorage.setItem('apiKey', apiKey);
-  };
-
-  const handlePluginKeyChange = (pluginKey: PluginKey) => {
-    if (pluginKeys.some((key) => key.pluginId === pluginKey.pluginId)) {
-      const updatedPluginKeys = pluginKeys.map((key) => {
-        if (key.pluginId === pluginKey.pluginId) {
-          return pluginKey;
-        }
-
-        return key;
-      });
-
-      setPluginKeys(updatedPluginKeys);
-
-      localStorage.setItem('pluginKeys', JSON.stringify(updatedPluginKeys));
-    } else {
-      setPluginKeys([...pluginKeys, pluginKey]);
-
-      localStorage.setItem(
-        'pluginKeys',
-        JSON.stringify([...pluginKeys, pluginKey]),
-      );
-    }
-  };
-
-  const handleClearPluginKey = (pluginKey: PluginKey) => {
-    const updatedPluginKeys = pluginKeys.filter(
-      (key) => key.pluginId !== pluginKey.pluginId,
-    );
-
-    if (updatedPluginKeys.length === 0) {
-      setPluginKeys([]);
-      localStorage.removeItem('pluginKeys');
-      return;
-    }
-
-    setPluginKeys(updatedPluginKeys);
-
-    localStorage.setItem('pluginKeys', JSON.stringify(updatedPluginKeys));
   };
 
   const handleToggleChatbar = () => {
@@ -488,10 +429,10 @@ const Home: React.FC<HomeProps> = ({
       name: `${t('New Conversation')}`,
       messages: [],
       model: lastConversation?.model || {
-        id: OpenAIModels[defaultModelId].id,
-        name: OpenAIModels[defaultModelId].name,
-        maxLength: OpenAIModels[defaultModelId].maxLength,
-        tokenLimit: OpenAIModels[defaultModelId].tokenLimit,
+        id: LLMS[defaultModelId].id,
+        name: LLMS[defaultModelId].name,
+        maxLength: LLMS[defaultModelId].maxLength,
+        tokenLimit: LLMS[defaultModelId].tokenLimit,
       },
       prompt: DEFAULT_SYSTEM_PROMPT,
       folderId: null,
@@ -525,7 +466,7 @@ const Home: React.FC<HomeProps> = ({
         id: uuidv4(),
         name: 'New conversation',
         messages: [],
-        model: OpenAIModels[defaultModelId],
+        model: LLMS[defaultModelId],
         prompt: DEFAULT_SYSTEM_PROMPT,
         folderId: null,
       });
@@ -559,7 +500,7 @@ const Home: React.FC<HomeProps> = ({
       id: uuidv4(),
       name: 'New conversation',
       messages: [],
-      model: OpenAIModels[defaultModelId],
+      model: LLMS[defaultModelId],
       prompt: DEFAULT_SYSTEM_PROMPT,
       folderId: null,
     });
@@ -605,7 +546,7 @@ const Home: React.FC<HomeProps> = ({
       name: `Prompt ${prompts.length + 1}`,
       description: '',
       content: '',
-      model: OpenAIModels[defaultModelId],
+      model: LLMS[defaultModelId],
       folderId: null,
     };
 
@@ -673,13 +614,6 @@ const Home: React.FC<HomeProps> = ({
       fetchModels(apiKey);
     }
 
-    const pluginKeys = localStorage.getItem('pluginKeys');
-    if (serverSidePluginKeysSet) {
-      setPluginKeys([]);
-      localStorage.removeItem('pluginKeys');
-    } else if (pluginKeys) {
-      setPluginKeys(JSON.parse(pluginKeys));
-    }
 
     if (window.innerWidth < 640) {
       setShowSidebar(false);
@@ -728,7 +662,7 @@ const Home: React.FC<HomeProps> = ({
         id: uuidv4(),
         name: 'New conversation',
         messages: [],
-        model: OpenAIModels[defaultModelId],
+        model: LLMS[defaultModelId],
         prompt: DEFAULT_SYSTEM_PROMPT,
         folderId: null,
       });
@@ -739,7 +673,10 @@ const Home: React.FC<HomeProps> = ({
     <>
       <Head>
         <title>AkashChat</title>
-        <meta name="description" content="This application is running on NVIDIA GPUs leased from the Akash Supercloud" />
+        <meta
+          name="description"
+          content="This application is running on NVIDIA GPUs leased from the Akash Supercloud"
+        />
         <meta
           name="viewport"
           content="height=device-height ,width=device-width, initial-scale=1, user-scalable=no"
@@ -751,7 +688,7 @@ const Home: React.FC<HomeProps> = ({
         <main
           className={`flex h-screen w-screen flex-col text-sm text-white dark:text-white ${lightMode}`}
         >
-          <div className="fixed top-0 w-full sm:hidden bg-[#242424]">
+          <div className="fixed top-0 w-full bg-[#242424] sm:hidden">
             <Navbar
               selectedConversation={selectedConversation}
               onNewConversation={handleNewConversation}
@@ -767,7 +704,6 @@ const Home: React.FC<HomeProps> = ({
                   lightMode={lightMode}
                   selectedConversation={selectedConversation}
                   apiKey={apiKey}
-                  pluginKeys={pluginKeys}
                   folders={folders.filter((folder) => folder.type === 'chat')}
                   onToggleLightMode={handleLightMode}
                   onCreateFolder={(name) => handleCreateFolder(name, 'chat')}
@@ -781,8 +717,6 @@ const Home: React.FC<HomeProps> = ({
                   onClearConversations={handleClearConversations}
                   onExportConversations={handleExportData}
                   onImportConversations={handleImportConversations}
-                  onPluginKeyChange={handlePluginKeyChange}
-                  onClearPluginKey={handleClearPluginKey}
                 />
 
                 <button
@@ -832,20 +766,10 @@ export default Home;
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   const defaultModelId = process.env.DEFAULT_MODEL;
 
-  let serverSidePluginKeysSet = false;
-
-  const googleApiKey = process.env.GOOGLE_API_KEY;
-  const googleCSEId = process.env.GOOGLE_CSE_ID;
-
-  if (googleApiKey && googleCSEId) {
-    serverSidePluginKeysSet = true;
-  }
-
   return {
     props: {
-      serverSideApiKeyIsSet: !!process.env.OPENAI_API_KEY,
+      serverSideApiKeyIsSet: !!process.env.API_KEY,
       defaultModelId,
-      serverSidePluginKeysSet,
       ...(await serverSideTranslations(locale ?? 'en', [
         'common',
         'chat',
