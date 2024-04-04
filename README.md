@@ -1,6 +1,6 @@
- # AkashChat - Advanced Chatbot UI built on Chatbot UI Lite
+ # AkashChat - Advanced Chatbot UI
 
-AkashChat is an enhanced chatbot interface based on [Chatbot UI Lite](https://github.com/mckaywrigley/chatbot-ui-lite). This project is a fork from the original Chatbot UI, a next-generation chatbot interface utilizing Next.js, TypeScript, and Tailwind CSS.
+AkashChat is an enhanced chatbot interface based on [Chatbot UI Lite](https://github.com/mckaywrigley/chatbot-ui-lite) a next-generation chatbot interface utilizing Next.js, TypeScript, and Tailwind CSS.
 
 ## Updates & Modifications
 
