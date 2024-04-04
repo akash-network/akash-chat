@@ -1,0 +1,21 @@
+{
+  "Stop Generating": "උත්පාදනය නවත්වන්න",
+  "Prompt limit is {{maxLength}} characters": "වචන සීමාව අනුලකුණු {{maxLength}} කි",
+  "System Prompt": "පද්ධති ඉඟිය",
+  "Enter a prompt": "ප්‍රේරකයක් ඇතුළු කරන්න",
+  "Regenerate response": "ප්‍රතිචාරය පුනර්ජනනය කරන්න",
+  "Sorry, there was an error.": "සමාවන්න, දෝෂයක් ඇති විය.",
+  "Model": "ආකෘතිය",
+  "Conversation": "සංවාදය",
+  "OR": "හෝ",
+  "Loading...": "පූරණය වෙමින්...",
+  "Error fetching models.": "ආකෘති ලබා ගැනීමේ දෝෂයකි.",
+  "AI": "AI",
+  "You": "ඔබ",
+  "Cancel": "Cancel",
+  "Save & Submit": "Save & Submit",
+  "click if using a .env.local file": "click if using a .env.local file",
+  "Message limit is {{maxLength}} characters. You have entered {{valueLength}} characters.": "පණිවිඩ සීමාව අකුරු {{maxLength}} කි. ඔබ අක්ෂර {{valueLength}} ඇතුළත් කර ඇත.।",
+  "Please enter a message": "කරුණාකර පණිවිඩයක් ඇතුළු කරන්න",
+  "Are you sure you want to clear all messages?": "ඔබට සියලු පණිවිඩ හිස් කිරීමට අවශ්‍ය බව විශ්වාසද?"
+}

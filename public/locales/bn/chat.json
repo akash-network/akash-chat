@@ -1,0 +1,21 @@
+{
+  "Stop Generating": "বার্তা জেনারেট করা বন্ধ করুন",
+  "Prompt limit is {{maxLength}} characters": "নির্দেশনা (বার্তা) সীমা সর্বোচ্চ {{maxLength}} অক্ষর",
+  "System Prompt": "সিস্টেম নির্দেশনা (বার্তা)",
+  "Enter a prompt": "একটি নির্দেশনা (বার্তা) দিন",
+  "Regenerate response": "বার্তা আবার জেনারেট করুন",
+  "Sorry, there was an error.": "দুঃখিত, কোনো একটি সমস্যা হয়েছে।",
+  "Model": "মডেল",
+  "Conversation": "আলাপচারিতা",
+  "OR": "অথবা",
+  "Loading...": "লোড হচ্ছে...",
+  "Error fetching models.": "মডেল পেতে সমস্যা হচ্ছে।",
+  "AI": "AI",
+  "You": "তুমি",
+  "Cancel": "Cancel",
+  "Save & Submit": "Save & Submit",
+  "click if using a .env.local file": "click if using a .env.local file",
+  "Message limit is {{maxLength}} characters. You have entered {{valueLength}} characters.": "বার্তার সর্বোচ্চ সীমা হল {{maxLength}} অক্ষর৷ আপনি {{valueLength}} অক্ষর লিখেছেন।",
+  "Please enter a message": "দয়া করে একটি মেসেজ লিখুন",
+  "Are you sure you want to clear all messages?": "সমস্ত বার্তা মুছে ফেলতে আপনি কি নিশ্চিত?"
+}

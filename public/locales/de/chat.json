@@ -1,0 +1,21 @@
+{
+  "Stop Generating": "Generieren stoppen",
+  "Prompt limit is {{maxLength}} characters": "Das Eingabelimit liegt bei {{maxLength}} Zeichen",
+  "System Prompt": "Systemaufforderung",
+  "Enter a prompt": "Gib eine Anweisung ein",
+  "Regenerate response": "Antwort erneut generieren",
+  "Sorry, there was an error.": "Entschuldigung, es ist ein Fehler aufgetreten.",
+  "Model": "Modell",
+  "Conversation": "Konversation",
+  "OR": "ODER",
+  "Loading...": "Laden...",
+  "Error fetching models.": "Fehler beim Abrufen der Sprachmodelle.",
+  "AI": "KI",
+  "You": "Du",
+  "Cancel": "Cancel",
+  "Save & Submit": "Save & Submit",
+  "click if using a .env.local file": "click if using a .env.local file",
+  "Message limit is {{maxLength}} characters. You have entered {{valueLength}} characters.": "Das Nachrichtenlimit beträgt {{maxLength}} Zeichen. Du hast bereits {{valueLength}} Zeichen eingegeben.",
+  "Please enter a message": "Bitte gib eine Nachricht ein",
+  "Are you sure you want to clear all messages?": "Bist du sicher, dass du alle Nachrichten löschen möchtest?"
+}

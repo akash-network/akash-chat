@@ -1,0 +1,21 @@
+{
+  "Stop Generating": "Dejar de generar",
+  "Prompt limit is {{maxLength}} characters": "El límite del mensaje es de {{maxLength}} caracteres",
+  "System Prompt": "Mensaje del sistema",
+  "Enter a prompt": "Ingrese un mensaje",
+  "Regenerate response": "Regenerar respuesta",
+  "Sorry, there was an error.": "Lo sentimos, ha ocurrido un error.",
+  "Model": "Modelo",
+  "Conversation": "Conversación",
+  "OR": "O",
+  "Loading...": "Cargando...",
+  "Error fetching models.": "Error al obtener los modelos.",
+  "AI": "IA",
+  "You": "Tú",
+  "Cancel": "Cancel",
+  "Save & Submit": "Save & Submit",
+  "click if using a .env.local file": "haz clic si estás utilizando un archivo .env.local",
+  "Message limit is {{maxLength}} characters. You have entered {{valueLength}} characters.": "El límite del mensaje es de {{maxLength}} caracteres. Has ingresado {{valueLength}} caracteres.",
+  "Please enter a message": "Por favor, ingrese un mensaje",
+  "Are you sure you want to clear all messages?": "¿Está seguro de que desea borrar todos los mensajes?"
+}

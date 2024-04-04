@@ -1,0 +1,21 @@
+{
+  "Stop Generating": "జెనరేట్ చేస్తున్న ప్రక్రియ నిలిపేయి",
+  "Prompt limit is {{maxLength}} characters": "ప్రాంప్ట్(సంకేతం) పరిమితి {{maxLength}} అక్షరాలు మాత్రమే",
+  "System Prompt": "సిస్టమ్ ప్రాంప్ట్",
+  "Enter a prompt": "ఒక ప్రాంప్ట్(సంకేతం) నమోదు చేయండి",
+  "Regenerate response": "పునరుత్పాదించు సమాధానం",
+  "Sorry, there was an error.": "క్షమించండి, ఒక పొరపాటు జరిగింది.",
+  "Model": "మోడల్",
+  "Conversation": "సంవాదం",
+  "OR": "లేదా",
+  "Loading...": "లోడ్ అవుతోంది...",
+  "Error fetching models.": "మోడల్స్ పొందడం లోపం జరిగింది.",
+  "AI": "AI",
+  "You": "నీవు",
+  "Cancel": "Cancel",
+  "Save & Submit": "Save & Submit",
+  "click if using a .env.local file": "click if using a .env.local file",
+  "Message limit is {{maxLength}} characters. You have entered {{valueLength}} characters.": "సందేశం పరిమితి {{maxLength}} అక్షరాలు. మీరు {{valueLength}} అక్షరాలు నమోదు చేసారు.",
+  "Please enter a message": "దయచేసి ఒక సందేశం నమోదు చేయండి",
+  "Are you sure you want to clear all messages?": "మీరు అన్ని సందేశాలను తొలగించాలా?"
+}

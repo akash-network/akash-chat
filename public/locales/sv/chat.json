@@ -1,0 +1,21 @@
+{
+  "Stop Generating": "Sluta generera",
+  "Prompt limit is {{maxLength}} characters": "Din prompt kan inte ha fler än {{maxLength}} tecken",
+  "System Prompt": "System prompt",
+  "Enter a prompt": "Ange en prompt",
+  "Regenerate response": "Återskapa svar",
+  "Sorry, there was an error.": "Ursäkta, det uppstod ett fel.",
+  "Model": "Modell",
+  "Conversation": "Konversation",
+  "OR": "ELLER",
+  "Loading...": "Laddar...",
+  "Error fetching models.": "Det gick inte att hämta modeller.",
+  "AI": "AI",
+  "You": "Du",
+  "Cancel": "Avbryt",
+  "Save & Submit": "Spara & Skicka",
+  "click if using a .env.local file": "klicka om du använder en .env.local-fil",
+  "Message limit is {{maxLength}} characters. You have entered {{valueLength}} characters.": "Meddelandegränsen är {{maxLength}} tecken. Du har angett {{valueLength}} tecken.",
+  "Please enter a message": "Vänligen ange ett meddelande",
+  "Are you sure you want to clear all messages?": "Är du säker på att du vill rensa alla meddelanden?"
+}
