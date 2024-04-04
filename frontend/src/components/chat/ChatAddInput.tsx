@@ -40,7 +40,7 @@ export const ChatAddInput: React.FC<ChatAddInputProps> = ({
                     </h2>
                     <AccordionPanel pb={4}>
                         <ChatSlider headline={"Temperature"} subline={"Higher values produce more diverse outputs"} stepSize={0.05} min={0} max={1} defaultValue={0.9} value={temperature} setValue={setTemperature} />
-                        <ChatSlider headline={"Max new tokens"} subline={"The maximum numbers of new tokens"} stepSize={64} min={64} max={640} defaultValue={256} value={maxNewTokens} setValue={setMaxNewTokens} />
+                        <ChatSlider headline={"Max new tokens"} subline={"The maximum numbers of new tokens"} stepSize={64} min={64} max={2048} defaultValue={256} value={maxNewTokens} setValue={setMaxNewTokens} />
                         <ChatSlider headline={"Top-p (nucleus sampling)"} subline={"Higher values sample more low-probability tokens"} stepSize={0.05} min={0} max={1} defaultValue={0.9} value={topP} setValue={setTopP} />
                         <ChatSlider headline={"Repetition penalty "} subline={"Penalize repeated tokens"} stepSize={0.05} min={1} max={2} defaultValue={1.2} value={penalty} setValue={setPenalty} />
                     </AccordionPanel>

@@ -1,4 +1,4 @@
-export const version = 'v0.2.27'
+export const version = 'v0.2.30'
 export const defaultModel = 'nous-hermes2-mixtral'
 
 export const models = [

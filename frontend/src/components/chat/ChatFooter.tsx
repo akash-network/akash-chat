@@ -6,7 +6,7 @@ import ResizeTextarea from "react-textarea-autosize";
 export const ChatFooter = ({ inputMessage, inputDisabled, setInputMessage, handleSendMessage }: { inputMessage: string, inputDisabled: boolean, setInputMessage: (message: string) => void, handleSendMessage: () => void }) => {
     return (
         <Flex w="100%" mt="5">
-            <Textarea style={{ resize: "none" }} minRows={1} rows={1} maxRows={6} as={ResizeTextarea} maxLength={200}
+            <Textarea style={{ resize: "none" }} minRows={1} rows={1} maxRows={6} as={ResizeTextarea} maxLength={2000}
                 placeholder="Type Something..."
                 borderLeftRadius={"lg"}
                 borderRightRadius={0}

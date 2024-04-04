@@ -1,5 +1,5 @@
 import { Box } from '@chakra-ui/react';
-import '../../scss/typing.css';
+import '../../css/typing.css';
 
 export const Typing = () => {
 
