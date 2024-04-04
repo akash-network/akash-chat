@@ -36,7 +36,7 @@ API_HOST=yourollamaendpoint
 ```
 
 > API_HOST is the endpoint of your compatible endpoint like a Ollama deployment
-> See `/types/openai.ts` how to add additional models.
+> See `/types/llms.ts` how to add additional models.
 
 **4. Run App**
 
