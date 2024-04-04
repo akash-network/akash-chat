@@ -2,7 +2,6 @@ import { Conversation } from '@/types/chat';
 import { KeyValuePair } from '@/types/data';
 import { SupportedExportFormats } from '@/types/export';
 import { Folder } from '@/types/folder';
-import { PluginKey } from '@/types/plugin';
 import { IconFolderPlus, IconMessagesOff, IconPlus } from '@tabler/icons-react';
 import { useTranslation } from 'next-i18next';
 import { FC, useEffect, useState } from 'react';

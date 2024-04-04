@@ -9,7 +9,6 @@ import { ErrorMessage } from '@/types/error';
 import { LatestExportFormat, SupportedExportFormats } from '@/types/export';
 import { Folder, FolderType } from '@/types/folder';
 import { LLM, LLMID, LLMS, fallbackModelID } from '@/types/llms';
-import { Plugin, PluginKey } from '@/types/plugin';
 import { Prompt } from '@/types/prompt';
 import { getEndpoint } from '@/utils/app/api';
 import {
@@ -36,13 +35,11 @@ import { v4 as uuidv4 } from 'uuid';
 
 interface HomeProps {
   serverSideApiKeyIsSet: boolean;
-  serverSidePluginKeysSet: boolean;
   defaultModelId: LLMID;
 }
 
 const Home: React.FC<HomeProps> = ({
   serverSideApiKeyIsSet,
-  serverSidePluginKeysSet,
   defaultModelId,
 }) => {
   const { t } = useTranslation('chat');
@@ -50,7 +47,6 @@ const Home: React.FC<HomeProps> = ({
   // STATE ----------------------------------------------
 
   const [apiKey, setApiKey] = useState<string>('');
-  const [pluginKeys, setPluginKeys] = useState<PluginKey[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [lightMode, setLightMode] = useState<'dark' | 'light'>('light');
   const [messageIsStreaming, setMessageIsStreaming] = useState<boolean>(false);
@@ -114,21 +110,7 @@ const Home: React.FC<HomeProps> = ({
       };
 
       const endpoint = getEndpoint(plugin);
-      let body;
-
-      if (!plugin) {
-        body = JSON.stringify(chatBody);
-      } else {
-        body = JSON.stringify({
-          ...chatBody,
-          googleAPIKey: pluginKeys
-            .find((key) => key.pluginId === 'google-search')
-            ?.requiredKeys.find((key) => key.key === 'GOOGLE_API_KEY')?.value,
-          googleCSEId: pluginKeys
-            .find((key) => key.pluginId === 'google-search')
-            ?.requiredKeys.find((key) => key.key === 'GOOGLE_CSE_ID')?.value,
-        });
-      }
+      let body = JSON.stringify(chatBody);
 
       const controller = new AbortController();
       const response = await fetch(endpoint, {
@@ -632,13 +614,6 @@ const Home: React.FC<HomeProps> = ({
       fetchModels(apiKey);
     }
 
-    const pluginKeys = localStorage.getItem('pluginKeys');
-    if (serverSidePluginKeysSet) {
-      setPluginKeys([]);
-      localStorage.removeItem('pluginKeys');
-    } else if (pluginKeys) {
-      setPluginKeys(JSON.parse(pluginKeys));
-    }
 
     if (window.innerWidth < 640) {
       setShowSidebar(false);
@@ -791,20 +766,10 @@ export default Home;
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   const defaultModelId = process.env.DEFAULT_MODEL;
 
-  let serverSidePluginKeysSet = false;
-
-  const googleApiKey = process.env.GOOGLE_API_KEY;
-  const googleCSEId = process.env.GOOGLE_CSE_ID;
-
-  if (googleApiKey && googleCSEId) {
-    serverSidePluginKeysSet = true;
-  }
-
   return {
     props: {
       serverSideApiKeyIsSet: !!process.env.API_KEY,
       defaultModelId,
-      serverSidePluginKeysSet,
       ...(await serverSideTranslations(locale ?? 'en', [
         'common',
         'chat',

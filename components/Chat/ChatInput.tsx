@@ -1,6 +1,5 @@
 import { Message } from '@/types/chat';
 import { LLM } from '@/types/llms';
-import { Plugin } from '@/types/plugin';
 import { Prompt } from '@/types/prompt';
 import { IconArrowUp, IconPlayerStop, IconRepeat } from '@tabler/icons-react';
 import { useTranslation } from 'next-i18next';
