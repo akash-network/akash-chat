@@ -1,4 +1,4 @@
-import { LLM } from './openai';
+import { LLM } from './llms';
 
 export interface Prompt {
   id: string;

@@ -1,5 +1,5 @@
 import { Message } from '@/types/chat';
-import { LLM } from '@/types/openai';
+import { LLM } from '@/types/llms';
 import {
   createParser,
   ParsedEvent,

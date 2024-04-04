@@ -1,4 +1,4 @@
-import { LLM, LLMID, LLMS } from '@/types/openai';
+import { LLM, LLMID, LLMS } from '@/types/llms';
 import { API_HOST } from '@/utils/app/const';
 
 export const config = {

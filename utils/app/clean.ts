@@ -1,5 +1,5 @@
 import { Conversation } from '@/types/chat';
-import { LLMID, LLMS } from '@/types/openai';
+import { LLMID, LLMS } from '@/types/llms';
 import { DEFAULT_SYSTEM_PROMPT } from './const';
 
 export const cleanSelectedConversation = (conversation: Conversation) => {

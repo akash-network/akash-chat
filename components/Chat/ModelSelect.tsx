@@ -1,4 +1,4 @@
-import { LLM, LLMID } from '@/types/openai';
+import { LLM, LLMID } from '@/types/llms';
 import { useTranslation } from 'next-i18next';
 import { IconExternalLink } from '@tabler/icons-react';
 import { FC } from 'react';

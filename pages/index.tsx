@@ -8,7 +8,7 @@ import { KeyValuePair } from '@/types/data';
 import { ErrorMessage } from '@/types/error';
 import { LatestExportFormat, SupportedExportFormats } from '@/types/export';
 import { Folder, FolderType } from '@/types/folder';
-import { LLM, LLMID, LLMS, fallbackModelID } from '@/types/openai';
+import { LLM, LLMID, LLMS, fallbackModelID } from '@/types/llms';
 import { Plugin, PluginKey } from '@/types/plugin';
 import { Prompt } from '@/types/prompt';
 import { getEndpoint } from '@/utils/app/api';
