@@ -48,7 +48,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     encoding.free();
 
-    const stream = await OpenAIStream(model, promptToSend, key, messagesToSend);
+    const stream = await OpenAIStream(model, promptToSend, `${key ? key : process.env.API_KEY}`, messagesToSend);
 
     return new Response(stream);
   } catch (error) {

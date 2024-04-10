@@ -30,6 +30,7 @@ export const OpenAIStream = async (
   const res = await fetch(`${API_HOST}/v1/chat/completions`, {
     headers: {
       'Content-Type': 'application/json',
+      Authorization: `Bearer ${key}`,
     },
     method: 'POST',
     body: JSON.stringify({
