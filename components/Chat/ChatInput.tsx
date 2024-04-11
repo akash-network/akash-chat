@@ -279,9 +279,9 @@ export const ChatInput: FC<Props> = ({
             onChange={handleChange}
             onKeyDown={handleKeyDown}
           />
-
+          
           <button
-            className={`absolute right-2 mt-1 mb-1 rounded-lg border bg-black p-0.5 disabled:opacity-20 dark:enabled:bg-white dark:disabled:border-white dark:disabled:bg-white`}
+            className={`my-2 absolute right-2 rounded-lg border bg-black p-0.5 disabled:opacity-20 dark:enabled:bg-white dark:disabled:border-white dark:disabled:bg-white`}
             onClick={handleSend}
             disabled={content?.trim().length === 0 || messageIsStreaming}
           >
