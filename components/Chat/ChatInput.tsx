@@ -257,40 +257,42 @@ export const ChatInput: FC<Props> = ({
           </button>
         )}
 
-        <div className="relative mx-2 flex w-full flex-grow flex-col rounded-md border border-black/10 bg-white shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:border-gray-500/50 dark:bg-[#1c1c1c] dark:text-white dark:shadow-[0_0_15px_rgba(0,0,0,0.10)] sm:mx-4">
-          <textarea
-            ref={textareaRef}
-            className="m-0 w-full resize-none border-0 bg-transparent p-0 py-2 pr-8 pl-4 text-black focus:outline-none dark:bg-transparent dark:text-white md:py-3 md:pl-4"
-            style={{
-              resize: 'none',
-              bottom: `${textareaRef?.current?.scrollHeight}px`,
-              maxHeight: '400px',
-              overflow: `${
-                textareaRef.current && textareaRef.current.scrollHeight > 400
+        <div className="relative mx-2 flex w-full flex-grow flex-col rounded-md border border-black/10 bg-white shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:border-gray-500/50 dark:bg-[#1c1c1c] dark:text-white dark:shadow-[0_0_15px_rgba(0,0,0,0.10)] sm:mx-4 overflow-hidden">
+          <div className="flex justify-between">
+            <textarea
+              ref={textareaRef}
+              className="m-0 w-full resize-none border-0 bg-transparent p-0 py-2 pr-8 pl-4 text-black focus:outline-none dark:bg-transparent dark:text-white md:py-3 md:pl-4"
+              style={{
+                resize: 'none',
+                bottom: `${textareaRef?.current?.scrollHeight}px`,
+                maxHeight: '400px',
+                overflow: `${
+                  textareaRef.current && textareaRef.current.scrollHeight > 400
                   ? 'auto'
                   : 'hidden'
-              }`,
-            }}
-            placeholder={'Message AkashChat...'}
-            value={content}
-            rows={1}
-            onCompositionStart={() => setIsTyping(true)}
-            onCompositionEnd={() => setIsTyping(false)}
-            onChange={handleChange}
-            onKeyDown={handleKeyDown}
-          />
-          
-          <button
-            className={`my-2 absolute right-2 rounded-lg border bg-black p-0.5 disabled:opacity-20 dark:enabled:bg-white dark:disabled:border-white dark:disabled:bg-white`}
-            onClick={handleSend}
-            disabled={content?.trim().length === 0 || messageIsStreaming}
-          >
-            {messageIsStreaming ? (
-              <Spinner size="20" className="text-white dark:text-black" />
-            ) : (
-              <IconArrowUp size={20} className="text-white dark:text-black" />
-            )}
-          </button>
+                }`,
+              }}
+              placeholder={'Message AkashChat...'}
+              value={content}
+              rows={1}
+              onCompositionStart={() => setIsTyping(true)}
+              onCompositionEnd={() => setIsTyping(false)}
+              onChange={handleChange}
+              onKeyDown={handleKeyDown}
+            />
+
+            <button
+              className={`bg-black p-0.5 disabled:opacity-20 dark:enabled:bg-white dark:disabled:border-white dark:disabled:bg-white`}
+              onClick={handleSend}
+              disabled={content?.trim().length === 0 || messageIsStreaming}
+            >
+              {messageIsStreaming ? (
+                <Spinner size="20" className="text-white dark:text-black" />
+              ) : (
+                <IconArrowUp size={20} className="text-white dark:text-black" />
+              )}
+            </button>
+          </div>
 
           {showPromptList && filteredPrompts.length > 0 && (
             <div className="absolute bottom-12 w-full">
