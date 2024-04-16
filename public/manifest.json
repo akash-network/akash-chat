@@ -1,0 +1,15 @@
+{
+  "name": "AkashChat",
+  "short_name": "AkashChat",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#fff",
+  "description": "AkashChat is a UI for LLMs hosted on Akash Network.",
+  "icons": [
+    {
+      "src": "logo192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+}
