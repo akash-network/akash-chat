@@ -21,9 +21,8 @@ import { ChatLoader } from './ChatLoader';
 import { ChatMessage } from './ChatMessage';
 import { ErrorMessageDiv } from './ErrorMessageDiv';
 import { ModelSelect } from './ModelSelect';
-import { SystemPrompt } from './SystemPrompt';
 import { AkashChatLogo } from '../Logos/akash-chat-logo';
-import Link from 'next/link';
+
 
 interface Props {
   conversation: Conversation;
@@ -204,13 +203,6 @@ export const Chat: FC<Props> = memo(
                     <div className="md:max-w-2xl md:py-6 lg:max-w-2xl lg:px-0 xl:max-w-3xl flex justify-center">
                       <AkashChatLogo />
                     </div>
-                    <Link href="https://akashnet.typeform.com/to/rhR4cWxQ">
-                      <button
-                        className={`sm:my-2 text-xs sm:text-sm font-semibold text-black dark:text-gray-100 cursor-pointer rounded-lg p-2 sm:p-3 transition-colors duration-200 hover:bg-[#ffb2b2]/90 bg-[#ce4747] flex justify-center`}
-                      >
-                        Want to run your own custom models?
-                      </button>
-                    </Link>
                   </div>
                   <div className="flex justify-center border border-b-neutral-300 bg-neutral-100 py-2 text-sm text-neutral-500 dark:border-none dark:bg-[#333d3d3d] dark:text-neutral-200">
                     {t('Model')}: {conversation.model.name}

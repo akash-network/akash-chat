@@ -6,6 +6,7 @@ import { Import } from '../Settings/Import';
 import { Key } from '../Settings/Key';
 import { SidebarButton } from '../Sidebar/SidebarButton';
 import { ClearConversations } from './ClearConversations';
+import { CTAButton } from '../Global/CTA';
 
 interface Props {
   lightMode: 'light' | 'dark';
@@ -32,6 +33,7 @@ export const ChatbarSettings: FC<Props> = ({
 
   return (
     <div className="flex flex-col items-center space-y-1 border-t border-white/20 pt-1 text-sm">
+      <CTAButton />
       {conversationsCount > 0 ? (
         <ClearConversations onClearConversations={onClearConversations} />
       ) : null}
