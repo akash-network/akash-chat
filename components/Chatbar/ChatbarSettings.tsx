@@ -38,7 +38,7 @@ export const ChatbarSettings: FC<Props> = ({
       <CTAButton />
 
       <SidebarButton
-        text={t('Akash Website')}
+        text={t('About Akash Network')}
         icon={<IconExternalLink size={18} />}
         onClick={() => onOpenWebsite()}
       />
