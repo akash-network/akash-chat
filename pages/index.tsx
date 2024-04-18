@@ -304,11 +304,13 @@ const Home: React.FC<HomeProps> = ({
 
     const modelOrder = [
       'mistral',
+      'mixtral-8x22b',
+      'llama3',
       'nous-hermes2-mixtral',
       'mixtral',
       'dolphin-mixtral',
     ];
-    const sortedData = data.sort((a: LLM, b: LLM) => {
+    data.sort((a: LLM, b: LLM) => {
       return modelOrder.indexOf(a.id) - modelOrder.indexOf(b.id);
     });
 

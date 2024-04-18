@@ -10,6 +10,8 @@ export enum LLMID {
   MIXTRAL = 'mixtral',
   DOLPHINMIXTRAL = 'dolphin-mixtral',
   NOUSHERMESMIXTRAL = 'nous-hermes2-mixtral',
+  //MIXTRAL8X22B = 'mixtral-8x22b',
+  LLAMA3 = 'llama3',
 }
 
 // in case the `DEFAULT_MODEL` environment variable is not set or set to an unsupported model
@@ -37,6 +39,18 @@ export const LLMS: Record<LLMID, LLM> = {
   [LLMID.DOLPHINMIXTRAL]: {
     id: LLMID.DOLPHINMIXTRAL,
     name: 'Dolphin Mixtral',
+    maxLength: 12000,
+    tokenLimit: 4000,
+  },/*
+  [LLMID.MIXTRAL8X22B]: {
+    id: LLMID.MIXTRAL8X22B,
+    name: 'Mixtral 8x22B',
+    maxLength: 12000,
+    tokenLimit: 4000,
+  },*/
+  [LLMID.LLAMA3]: {
+    id: LLMID.LLAMA3,
+    name: 'Llama3',
     maxLength: 12000,
     tokenLimit: 4000,
   },
