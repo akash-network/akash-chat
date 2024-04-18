@@ -197,6 +197,7 @@ export const Chatbar: FC<Props> = ({
         onClearConversations={onClearConversations}
         onExportConversations={onExportConversations}
         onImportConversations={onImportConversations}
+        onOpenWebsite={() => window.open('https://akash.network')}
       />
     </div>
   );
