@@ -15,7 +15,7 @@ export enum LLMID {
 }
 
 // in case the `DEFAULT_MODEL` environment variable is not set or set to an unsupported model
-export const fallbackModelID = LLMID.MISTRAL;
+export const fallbackModelID = LLMID.LLAMA3;
 
 export const LLMS: Record<LLMID, LLM> = {
   [LLMID.MISTRAL]: {
