@@ -303,7 +303,7 @@ const Home: React.FC<HomeProps> = ({
     }
 
     const modelOrder = [
-      'llama3',
+      'llama3-8b',
       'mistral',
       //'mixtral-8x22b',
       'nous-hermes2-mixtral',
