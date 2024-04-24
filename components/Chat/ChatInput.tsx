@@ -213,9 +213,8 @@ export const ChatInput: FC<Props> = ({
     if (textareaRef && textareaRef.current) {
       textareaRef.current.style.height = 'inherit';
       textareaRef.current.style.height = `${textareaRef.current?.scrollHeight}px`;
-      textareaRef.current.style.overflow = `${
-        textareaRef?.current?.scrollHeight > 400 ? 'auto' : 'hidden'
-      }`;
+      textareaRef.current.style.overflow = `${textareaRef?.current?.scrollHeight > 400 ? 'auto' : 'hidden'
+        }`;
     }
   }, [content]);
 
@@ -266,11 +265,10 @@ export const ChatInput: FC<Props> = ({
                 resize: 'none',
                 bottom: `${textareaRef?.current?.scrollHeight}px`,
                 maxHeight: '400px',
-                overflow: `${
-                  textareaRef.current && textareaRef.current.scrollHeight > 400
+                overflow: `${textareaRef.current && textareaRef.current.scrollHeight > 400
                   ? 'auto'
                   : 'hidden'
-                }`,
+                  }`,
               }}
               placeholder={'Message AkashChat...'}
               value={content}
@@ -315,6 +313,9 @@ export const ChatInput: FC<Props> = ({
             />
           )}
         </div>
+      </div>
+      <div className="text-center last:my-1 text-xs text-neutral-500 dark:text-neutral-200">
+          AI models can make mistakes. Please double-check responses.
       </div>
     </div>
   );
