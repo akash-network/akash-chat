@@ -49,15 +49,19 @@ const handler = async (req: Request): Promise<Response> => {
     encoding.free();
 
     if (process.env.INFLUXDB_ENDPOINT && process.env.INFLUXDB_TOKEN) {
-      // log to influxdb api
-      await fetch(`${process.env.INFLUXDB_ENDPOINT}/api/v2/write?org=AKT&bucket=logdb&precision=ms`, {
-        headers: {
-          'Content-Type': 'text/plain',
-          Authorization: `Token ${process.env.INFLUXDB_TOKEN}`,
-        },
-        method: 'POST',
-        body: `chatlogs,model=${model.id} value=1`,
-      });
+      try {
+        // log to influxdb api
+        await fetch(`${process.env.INFLUXDB_ENDPOINT}/api/v2/write?org=AKT&bucket=logdb&precision=ms`, {
+          headers: {
+            'Content-Type': 'text/plain',
+            Authorization: `Token ${process.env.INFLUXDB_TOKEN}`,
+          },
+          method: 'POST',
+          body: `chatlogs,model=${model.id} value=1`,
+        });
+      } catch (error) {
+        console.error('Failed to log to InfluxDB', error);
+      }
     }
 
     const stream = await OpenAIStream(model, promptToSend, `${key ? key : process.env.API_KEY}`, messagesToSend);
