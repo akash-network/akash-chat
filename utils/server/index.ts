@@ -36,7 +36,7 @@ export const OpenAIStream = async (
     body: JSON.stringify({
       model: model.id,
       messages: [...messages],
-      max_tokens: 512,
+      max_tokens: 1024,
       temperature: 1,
       stream: true,
     }),
@@ -57,7 +57,7 @@ export const OpenAIStream = async (
       console.log(res);
 
       throw new Error(
-        `OpenAI API returned an error: ${
+        `API returned an error: ${
           decoder.decode(result?.message) || result.statusText
         }`,
       );
