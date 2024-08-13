@@ -23,7 +23,7 @@ export const LLMS: Record<LLMID, LLM> = {
     id: LLMID.MISTRAL,
     name: 'Mistral-7B',
     maxLength: 12000,
-    tokenLimit: 4000,
+    tokenLimit: 8192,
   },
   [LLMID.NOUSHERMESMIXTRAL]: {
     id: LLMID.NOUSHERMESMIXTRAL,
@@ -35,7 +35,7 @@ export const LLMS: Record<LLMID, LLM> = {
     id: LLMID.MIXTRAL,
     name: 'Mixtral',
     maxLength: 12000,
-    tokenLimit: 4000,
+    tokenLimit: 8192,
   },
   [LLMID.DOLPHINMIXTRAL]: {
     id: LLMID.DOLPHINMIXTRAL,
@@ -53,12 +53,12 @@ export const LLMS: Record<LLMID, LLM> = {
     id: LLMID.LLAMA38B,
     name: 'Llama3 8B',
     maxLength: 12000,
-    tokenLimit: 4000,
+    tokenLimit: 8192,
   },
   [LLMID.LLAMA31405B8Bit]: {
     id: LLMID.LLAMA31405B8Bit,
     name: 'Llama 3.1 405B',
-    maxLength: 12000,
-    tokenLimit: 4000,
+    maxLength: 4000,
+    tokenLimit: 12000,
   },
 };
