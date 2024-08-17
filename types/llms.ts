@@ -11,12 +11,12 @@ export enum LLMID {
   DOLPHINMIXTRAL = 'dolphin-mixtral',
   NOUSHERMESMIXTRAL = 'nous-hermes2-mixtral',
   //MIXTRAL8X22B = 'mixtral-8x22b',
-  LLAMA38B = 'llama3-8b',
+  LLAMA318B8Bit = 'Meta-Llama-3-1-8B-Instruct-FP8',
   LLAMA31405B8Bit = 'Meta-Llama-3-1-405B-Instruct-FP8',
 }
 
 // in case the `DEFAULT_MODEL` environment variable is not set or set to an unsupported model
-export const fallbackModelID = LLMID.LLAMA38B;
+export const fallbackModelID = LLMID.LLAMA318B8Bit;
 
 export const LLMS: Record<LLMID, LLM> = {
   [LLMID.MISTRAL]: {
@@ -49,11 +49,11 @@ export const LLMS: Record<LLMID, LLM> = {
     maxLength: 12000,
     tokenLimit: 4000,
   },*/
-  [LLMID.LLAMA38B]: {
-    id: LLMID.LLAMA38B,
-    name: 'Llama3 8B',
-    maxLength: 12000,
-    tokenLimit: 8192,
+  [LLMID.LLAMA318B8Bit]: {
+    id: LLMID.LLAMA318B8Bit,
+    name: 'Llama 3.1 8B',
+    maxLength: 4000,
+    tokenLimit: 12000,
   },
   [LLMID.LLAMA31405B8Bit]: {
     id: LLMID.LLAMA31405B8Bit,
@@ -61,4 +61,11 @@ export const LLMS: Record<LLMID, LLM> = {
     maxLength: 4000,
     tokenLimit: 12000,
   },
+  /*
+  [LLMID.LLAMA38B]: {
+    id: LLMID.LLAMA38B,
+    name: 'Llama 3 8B',
+    maxLength: 4000,
+    tokenLimit: 12000,
+  },*/
 };
