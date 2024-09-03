@@ -36,7 +36,7 @@ export const OpenAIStream = async (
     body: JSON.stringify({
       model: model.id,
       messages: [...messages],
-      max_tokens: 1024,
+      max_tokens: model.maxLength || 1024,
       temperature: 1,
       stream: true,
     }),
