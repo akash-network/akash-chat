@@ -41,3 +41,9 @@ html {
 pre:has(div.codeblock) {
   padding: 0;
 }
+
+@supports (padding: max(0px)) {
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
