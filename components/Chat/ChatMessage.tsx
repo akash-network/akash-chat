@@ -13,6 +13,8 @@ import remarkMath from 'remark-math';
 import { CodeBlock } from '../Markdown/CodeBlock';
 import { MemoizedReactMarkdown } from '../Markdown/MemoizedReactMarkdown';
 import { AkashSignLogo } from '../Logos/akash-sign-logo';
+import styles from './ChatMessage.module.css';
+
 
 interface Props {
   message: Message;
@@ -181,7 +183,7 @@ export const ChatMessage: FC<Props> = memo(
                 </div>
 
                 <MemoizedReactMarkdown
-                  className="prose dark:prose-invert"
+                className={`prose dark:prose-invert ${styles.chatMessage}`}
                   remarkPlugins={[remarkGfm, remarkMath]}
                   rehypePlugins={[rehypeMathjax]}
                   components={{

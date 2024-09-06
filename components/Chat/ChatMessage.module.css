@@ -1,0 +1,16 @@
+@supports (-webkit-hyphens:none) {
+    .chatMessage ol,
+    .chatMessage ul {
+        list-style-position: inside;
+        padding-left: 0;
+    }
+
+    .chatMessage li {
+        display: list-item;
+        margin: 0;
+    }
+
+    .chatMessage li>p {
+        display: inline;
+    }
+}
