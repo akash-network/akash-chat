@@ -5,6 +5,7 @@ import tiktokenModel from '@dqbd/tiktoken/encoders/cl100k_base.json';
 import { Tiktoken, init } from '@dqbd/tiktoken/lite/init';
 // @ts-expect-error
 import wasm from '../../node_modules/@dqbd/tiktoken/lite/tiktoken_bg.wasm?module';
+import { fallbackModelID, LLMS } from '@/types/llms';
 
 export const config = {
   runtime: 'edge',
@@ -13,6 +14,13 @@ export const config = {
 const handler = async (req: Request): Promise<Response> => {
   try {
     const { model, messages, key, prompt } = (await req.json()) as ChatBody;
+let modelInfo = LLMS[model.id as keyof typeof LLMS];
+    
+    if (!modelInfo) {
+      model = LLMS[fallbackModelID as keyof typeof LLMS];
+      modelInfo = LLMS[fallbackModelID as keyof typeof LLMS];
+      console.log(` Falling back to model: ${model.id}`);
+    }
 
     await init((imports) => WebAssembly.instantiate(wasm, imports));
     const encoding = new Tiktoken(
@@ -39,7 +47,8 @@ const handler = async (req: Request): Promise<Response> => {
       const message = messages[i];
       const tokens = encoding.encode(message.content);
 
-      if (tokenCount + tokens.length + 1000 > model.tokenLimit) {
+      if (tokenCount + tokens.length + 1000 > modelInfo.tokenLimit) {
+        console.log(`Token limit reached: ${tokenCount + tokens.length}`);
         break;
       }
       tokenCount += tokens.length;
