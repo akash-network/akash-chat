@@ -13,6 +13,7 @@ export enum LLMID {
   //MIXTRAL8X22B = 'mixtral-8x22b',
   LLAMA318B8Bit = 'Meta-Llama-3-1-8B-Instruct-FP8',
   LLAMA31405B8Bit = 'Meta-Llama-3-1-405B-Instruct-FP8',
+  LLAMA323B = 'Meta-Llama-3-2-3B-Instruct'
 }
 
 // in case the `DEFAULT_MODEL` environment variable is not set or set to an unsupported model
@@ -58,6 +59,12 @@ export const LLMS: Record<LLMID, LLM> = {
   [LLMID.LLAMA31405B8Bit]: {
     id: LLMID.LLAMA31405B8Bit,
     name: 'Llama 3.1 405B',
+    maxLength: 4000,
+    tokenLimit: 12000,
+  },
+  [LLMID.LLAMA323B]: {
+    id: LLMID.LLAMA323B,
+    name: 'Llama 3.2 3B',
     maxLength: 4000,
     tokenLimit: 12000,
   },
