@@ -3,6 +3,8 @@ export interface LLM {
   name: string;
   maxLength: number; // maximum length of a message
   tokenLimit: number;
+  temperature?: number;
+  top_p?: number;
 }
 
 export enum LLMID {
@@ -55,18 +57,24 @@ export const LLMS: Record<LLMID, LLM> = {
     name: 'Llama 3.1 8B',
     maxLength: 4000,
     tokenLimit: 12000,
+    temperature: 0.6,
+    top_p: 0.9
   },
   [LLMID.LLAMA31405B8Bit]: {
     id: LLMID.LLAMA31405B8Bit,
     name: 'Llama 3.1 405B',
     maxLength: 4000,
     tokenLimit: 12000,
+    temperature: 0.6,
+    top_p: 0.9
   },
   [LLMID.LLAMA323B]: {
     id: LLMID.LLAMA323B,
     name: 'Llama 3.2 3B',
     maxLength: 4000,
     tokenLimit: 12000,
+    temperature: 0.6,
+    top_p: 0.9
   },
   /*
   [LLMID.LLAMA38B]: {

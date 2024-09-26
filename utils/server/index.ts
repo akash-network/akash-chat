@@ -37,7 +37,8 @@ export const OpenAIStream = async (
       model: model.id,
       messages: [...messages],
       max_tokens: model.maxLength || 1024,
-      temperature: 1,
+      temperature: model.temperature ?? 0.7,
+      top_p: model.top_p ?? 1,
       stream: true,
     }),
   });
