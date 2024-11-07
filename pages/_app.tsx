@@ -12,7 +12,7 @@ function App({ Component, pageProps }: AppProps<{}>) {
     <div className={inter.className}>
       <Toaster />
       <Component {...pageProps} />
-      <GoogleTagManager gtmId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID!}/>
+      <GoogleTagManager gtmId={process.env.NEXT_PUBLIC_GA_ID ?? ''} />
     </div>
   );
 }
