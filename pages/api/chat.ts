@@ -13,8 +13,8 @@ export const config = {
 
 const handler = async (req: Request): Promise<Response> => {
   try {
-    const { model, messages, key, prompt } = (await req.json()) as ChatBody;
-let modelInfo = LLMS[model.id as keyof typeof LLMS];
+    let { model, messages, key, prompt } = (await req.json()) as ChatBody;
+    let modelInfo = LLMS[model.id as keyof typeof LLMS];
     
     if (!modelInfo) {
       model = LLMS[fallbackModelID as keyof typeof LLMS];

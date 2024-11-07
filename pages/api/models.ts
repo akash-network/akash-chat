@@ -25,8 +25,7 @@ const handler = async (req: Request): Promise<Response> => {
       });
     } else if (response.status !== 200) {
       console.error(
-        `API returned an error ${
-          response.status
+        `API returned an error ${response.status
         }: ${await response.text()}`,
       );
       console.log(response);

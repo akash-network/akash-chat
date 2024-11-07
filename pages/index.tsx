@@ -304,10 +304,10 @@ const Home: React.FC<HomeProps> = ({
 
     const modelOrder = [
       'Meta-Llama-3-1-8B-Instruct-FP8',
+      'nvidia-Llama-3-1-Nemotron-70B-Instruct-HF',
       'Meta-Llama-3-1-405B-Instruct-FP8',
       'Meta-Llama-3-2-3B-Instruct',
       'mistral',
-      //'mixtral-8x22b',
       'nous-hermes2-mixtral',
       'mixtral',
       'dolphin-mixtral',

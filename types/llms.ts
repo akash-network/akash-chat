@@ -12,10 +12,10 @@ export enum LLMID {
   MIXTRAL = 'mixtral',
   DOLPHINMIXTRAL = 'dolphin-mixtral',
   NOUSHERMESMIXTRAL = 'nous-hermes2-mixtral',
-  //MIXTRAL8X22B = 'mixtral-8x22b',
   LLAMA318B8Bit = 'Meta-Llama-3-1-8B-Instruct-FP8',
   LLAMA31405B8Bit = 'Meta-Llama-3-1-405B-Instruct-FP8',
-  LLAMA323B = 'Meta-Llama-3-2-3B-Instruct'
+  LLAMA323B = 'Meta-Llama-3-2-3B-Instruct',
+  NVDALLAMANEMO = 'nvidia-Llama-3-1-Nemotron-70B-Instruct-HF',
 }
 
 // in case the `DEFAULT_MODEL` environment variable is not set or set to an unsupported model
@@ -45,13 +45,7 @@ export const LLMS: Record<LLMID, LLM> = {
     name: 'Dolphin Mixtral',
     maxLength: 12000,
     tokenLimit: 4000,
-  },/*
-  [LLMID.MIXTRAL8X22B]: {
-    id: LLMID.MIXTRAL8X22B,
-    name: 'Mixtral 8x22B',
-    maxLength: 12000,
-    tokenLimit: 4000,
-  },*/
+  },
   [LLMID.LLAMA318B8Bit]: {
     id: LLMID.LLAMA318B8Bit,
     name: 'Llama 3.1 8B',
@@ -76,11 +70,12 @@ export const LLMS: Record<LLMID, LLM> = {
     temperature: 0.6,
     top_p: 0.9
   },
-  /*
-  [LLMID.LLAMA38B]: {
-    id: LLMID.LLAMA38B,
-    name: 'Llama 3 8B',
+  [LLMID.NVDALLAMANEMO]: {
+    id: LLMID.NVDALLAMANEMO,
+    name: 'Nvidia Llama 3.1 Nemotron 70B',
     maxLength: 4000,
     tokenLimit: 12000,
-  },*/
+    temperature: 0.6,
+    top_p: 0.9
+  }
 };
