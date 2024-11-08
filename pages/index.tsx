@@ -67,6 +67,8 @@ const Home: React.FC<HomeProps> = ({
   const [prompts, setPrompts] = useState<Prompt[]>([]);
   const [showPromptbar, setShowPromptbar] = useState<boolean>(true);
 
+  const [systemPrompt, setSystemPrompt] = useState<string>(DEFAULT_SYSTEM_PROMPT);
+
   // REFS ----------------------------------------------
 
   const stopConversationRef = useRef<boolean>(false);
@@ -356,6 +358,11 @@ const Home: React.FC<HomeProps> = ({
     saveConversation(conversation);
   };
 
+  const handleSystemPromptChange = (prompt: string) => {
+    setSystemPrompt(prompt);
+    localStorage.setItem('systemPrompt', prompt);
+  };
+
   // FOLDER OPERATIONS  --------------------------------------------
 
   const handleCreateFolder = (name: string, type: FolderType) => {
@@ -434,7 +441,7 @@ const Home: React.FC<HomeProps> = ({
         maxLength: LLMS[defaultModelId].maxLength,
         tokenLimit: LLMS[defaultModelId].tokenLimit,
       },
-      prompt: DEFAULT_SYSTEM_PROMPT,
+      prompt: systemPrompt,
       folderId: null,
     };
 
@@ -667,6 +674,11 @@ const Home: React.FC<HomeProps> = ({
         folderId: null,
       });
     }
+
+    const savedSystemPrompt = localStorage.getItem('systemPrompt');
+    if (savedSystemPrompt) {
+      setSystemPrompt(savedSystemPrompt);
+    }
   }, [serverSideApiKeyIsSet]);
 
   return (
@@ -753,6 +765,8 @@ const Home: React.FC<HomeProps> = ({
                 onUpdateConversation={handleUpdateConversation}
                 onEditMessage={handleEditMessage}
                 stopConversationRef={stopConversationRef}
+                systemPrompt={systemPrompt}
+                onSystemPromptChange={handleSystemPromptChange}
               />
             </div>
           </div>

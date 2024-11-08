@@ -46,6 +46,8 @@ interface Props {
   ) => void;
   onEditMessage: (message: Message, messageIndex: number) => void;
   stopConversationRef: MutableRefObject<boolean>;
+  systemPrompt: string;
+  onSystemPromptChange: (prompt: string) => void;
 }
 
 export const Chat: FC<Props> = memo(
@@ -63,6 +65,8 @@ export const Chat: FC<Props> = memo(
     onUpdateConversation,
     onEditMessage,
     stopConversationRef,
+    systemPrompt,
+    onSystemPromptChange,
   }) => {
     const { t } = useTranslation('chat');
     const [currentMessage, setCurrentMessage] = useState<Message>();
@@ -193,6 +197,8 @@ export const Chat: FC<Props> = memo(
                               value: model,
                             })
                           }
+                          systemPrompt={systemPrompt}
+                          onSystemPromptChange={onSystemPromptChange}
                         />
                         {/*}
                         <SystemPrompt
@@ -244,6 +250,8 @@ export const Chat: FC<Props> = memo(
                               value: model,
                             })
                           }
+                          systemPrompt={systemPrompt}
+                          onSystemPromptChange={onSystemPromptChange}
                         />
                       </div>
                     </div>
