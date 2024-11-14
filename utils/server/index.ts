@@ -27,6 +27,12 @@ export const OpenAIStream = async (
   key: string,
   messages: Message[],
 ) => {
+
+  const system_message = {
+    role: 'system',
+    content: systemPrompt,
+  };
+
   const res = await fetch(`${API_HOST}/v1/chat/completions`, {
     headers: {
       'Content-Type': 'application/json',
@@ -35,7 +41,7 @@ export const OpenAIStream = async (
     method: 'POST',
     body: JSON.stringify({
       model: model.id,
-      messages: [...messages],
+      messages: [system_message, ...messages],
       max_tokens: model.maxLength || 1024,
       temperature: model.temperature ?? 0.7,
       top_p: model.top_p ?? 1,

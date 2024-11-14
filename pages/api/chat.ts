@@ -38,10 +38,6 @@ const handler = async (req: Request): Promise<Response> => {
 
     let tokenCount = prompt_tokens.length;
     let messagesToSend: Message[] = [];
-    if (messages.length === 1) {
-      // include system prompt the message because mistral doesn't support it
-      messages[0].content = `${promptToSend} - ${messages[0].content}`;
-    }
 
     for (let i = messages.length - 1; i >= 0; i--) {
       const message = messages[i];
