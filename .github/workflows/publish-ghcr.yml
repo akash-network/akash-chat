@@ -39,4 +39,5 @@ jobs:
         with:
           context: .
           push: true
+          build-args: NEXT_PUBLIC_GA_ID=${{ vars.NEXT_PUBLIC_GA_ID }}
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.event.inputs.tag || 'latest' }}
