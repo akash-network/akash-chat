@@ -9,6 +9,8 @@ RUN npm ci
 
 # ---- Build ----
 FROM dependencies AS build
+ARG NEXT_PUBLIC_GA_ID
+ENV NEXT_PUBLIC_GA_ID=${NEXT_PUBLIC_GA_ID}
 COPY . .
 RUN npm run build
 
