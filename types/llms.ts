@@ -16,6 +16,7 @@ export enum LLMID {
   LLAMA31405B8Bit = 'Meta-Llama-3-1-405B-Instruct-FP8',
   LLAMA323B = 'Meta-Llama-3-2-3B-Instruct',
   NVDALLAMANEMO = 'nvidia-Llama-3-1-Nemotron-70B-Instruct-HF',
+  LLAMA3370B = 'Meta-Llama-3-3-70B-Instruct',
 }
 
 // in case the `DEFAULT_MODEL` environment variable is not set or set to an unsupported model
@@ -73,8 +74,16 @@ export const LLMS: Record<LLMID, LLM> = {
   [LLMID.NVDALLAMANEMO]: {
     id: LLMID.NVDALLAMANEMO,
     name: 'Nvidia Llama 3.1 Nemotron 70B',
-    maxLength: 4000,
-    tokenLimit: 12000,
+    maxLength: 8000,
+    tokenLimit: 24000,
+    temperature: 0.6,
+    top_p: 0.9
+  },
+  [LLMID.LLAMA3370B]: {
+    id: LLMID.LLAMA3370B,
+    name: 'Llama 3.3 70B',
+    maxLength: 8000,
+    tokenLimit: 24000,
     temperature: 0.6,
     top_p: 0.9
   }
