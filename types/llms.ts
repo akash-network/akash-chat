@@ -9,13 +9,11 @@ export interface LLM {
 
 export enum LLMID {
   MISTRAL = 'mistral',
-  MIXTRAL = 'mixtral',
   DOLPHINMIXTRAL = 'dolphin-mixtral',
   NOUSHERMESMIXTRAL = 'nous-hermes2-mixtral',
   LLAMA318B8Bit = 'Meta-Llama-3-1-8B-Instruct-FP8',
   LLAMA31405B8Bit = 'Meta-Llama-3-1-405B-Instruct-FP8',
   LLAMA323B = 'Meta-Llama-3-2-3B-Instruct',
-  NVDALLAMANEMO = 'nvidia-Llama-3-1-Nemotron-70B-Instruct-HF',
   LLAMA3370B = 'Meta-Llama-3-3-70B-Instruct',
 }
 
@@ -35,12 +33,6 @@ export const LLMS: Record<LLMID, LLM> = {
     maxLength: 12000,
     tokenLimit: 4000,
   },
-  [LLMID.MIXTRAL]: {
-    id: LLMID.MIXTRAL,
-    name: 'Mixtral',
-    maxLength: 12000,
-    tokenLimit: 8192,
-  },
   [LLMID.DOLPHINMIXTRAL]: {
     id: LLMID.DOLPHINMIXTRAL,
     name: 'Dolphin Mixtral',
@@ -57,7 +49,7 @@ export const LLMS: Record<LLMID, LLM> = {
   },
   [LLMID.LLAMA31405B8Bit]: {
     id: LLMID.LLAMA31405B8Bit,
-    name: 'Llama 3.1 405B',
+    name: 'Llama 3.1 405B - Most intelligent',
     maxLength: 4000,
     tokenLimit: 12000,
     temperature: 0.6,
@@ -65,23 +57,15 @@ export const LLMS: Record<LLMID, LLM> = {
   },
   [LLMID.LLAMA323B]: {
     id: LLMID.LLAMA323B,
-    name: 'Llama 3.2 3B',
+    name: 'Llama 3.2 3B - Fastest',
     maxLength: 4000,
     tokenLimit: 12000,
     temperature: 0.6,
     top_p: 0.9
   },
-  [LLMID.NVDALLAMANEMO]: {
-    id: LLMID.NVDALLAMANEMO,
-    name: 'Nvidia Llama 3.1 Nemotron 70B',
-    maxLength: 8000,
-    tokenLimit: 24000,
-    temperature: 0.6,
-    top_p: 0.9
-  },
   [LLMID.LLAMA3370B]: {
     id: LLMID.LLAMA3370B,
-    name: 'Llama 3.3 70B',
+    name: 'Llama 3.3 70B - Great for most tasks',
     maxLength: 8000,
     tokenLimit: 24000,
     temperature: 0.6,

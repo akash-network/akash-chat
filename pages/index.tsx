@@ -304,13 +304,11 @@ const Home: React.FC<HomeProps> = ({
 
     const modelOrder = [
       'Meta-Llama-3-3-70B-Instruct',
-      'Meta-Llama-3-1-8B-Instruct-FP8',
-      'nvidia-Llama-3-1-Nemotron-70B-Instruct-HF',
       'Meta-Llama-3-1-405B-Instruct-FP8',
       'Meta-Llama-3-2-3B-Instruct',
+      'Meta-Llama-3-1-8B-Instruct-FP8',
       'mistral',
       'nous-hermes2-mixtral',
-      'mixtral',
       'dolphin-mixtral',
     ];
     data.sort((a: LLM, b: LLM) => {
