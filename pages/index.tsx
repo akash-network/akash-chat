@@ -303,6 +303,7 @@ const Home: React.FC<HomeProps> = ({
     }
 
     const modelOrder = [
+      'DeepSeek-V3',
       'Meta-Llama-3-3-70B-Instruct',
       'Meta-Llama-3-1-405B-Instruct-FP8',
       'Meta-Llama-3-2-3B-Instruct',

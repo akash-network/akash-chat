@@ -15,6 +15,7 @@ export enum LLMID {
   LLAMA31405B8Bit = 'Meta-Llama-3-1-405B-Instruct-FP8',
   LLAMA323B = 'Meta-Llama-3-2-3B-Instruct',
   LLAMA3370B = 'Meta-Llama-3-3-70B-Instruct',
+  DEEPSEEKV3 = 'DeepSeek-V3',
 }
 
 // in case the `DEFAULT_MODEL` environment variable is not set or set to an unsupported model
@@ -70,5 +71,13 @@ export const LLMS: Record<LLMID, LLM> = {
     tokenLimit: 24000,
     temperature: 0.6,
     top_p: 0.9
+  },
+  [LLMID.DEEPSEEKV3]: {
+    id: LLMID.DEEPSEEKV3,
+    name: 'DeepSeek V3',
+    maxLength: 12000,
+    tokenLimit: 24000,
+    temperature: 0.7,
+    top_p: 1.0
   }
 };
