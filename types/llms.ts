@@ -75,8 +75,8 @@ export const LLMS: Record<LLMID, LLM> = {
   [LLMID.DEEPSEEKV3]: {
     id: LLMID.DEEPSEEKV3,
     name: 'DeepSeek V3',
-    maxLength: 12000,
-    tokenLimit: 24000,
+    maxLength: 4096,
+    tokenLimit: 16384,
     temperature: 0.7,
     top_p: 1.0
   }
