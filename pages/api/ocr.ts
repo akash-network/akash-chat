@@ -1,6 +1,15 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import Tesseract from 'tesseract.js';
 
+// Configure API to use the Node.js runtime
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: '10mb', // Increase the size limit for image uploads
+    },
+  },
+};
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -24,9 +33,9 @@ export default async function handler(
     // Process the image with Tesseract.js
     const result = await Tesseract.recognize(
       `data:image/jpeg;base64,${base64Data}`,
-      'eng',
+      'eng', // language
       { 
-        logger: m => console.log(m) 
+        logger: (m: Tesseract.LoggerMessage) => console.log(m) 
       }
     );
 

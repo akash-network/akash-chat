@@ -16,6 +16,7 @@ import { PromptList } from './PromptList';
 import { VariableModal } from './VariableModal';
 import { Spinner } from '../Global/Spinner';
 import { ImageUploadButton } from './ImageUploadButton';
+import { fileToDataURL, processImageWithOCR } from '@/utils/app/image';
 
 
 interface Props {
@@ -76,7 +77,7 @@ export const ChatInput: FC<Props> = ({
     updatePromptListVisibility(value);
   };
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (messageIsStreaming) {
       return;
     }
@@ -93,7 +94,23 @@ export const ChatInput: FC<Props> = ({
     if (selectedImage && imagePreview) {
       message.image = imagePreview;
       setIsProcessingImage(true);
-      // Process image if needed, then set isProcessingImage to false when done
+      
+      try {
+        // Process image with OCR using our utility function
+        const ocrResult = await processImageWithOCR(imagePreview);
+        
+        if (ocrResult.text && ocrResult.text.trim()) {
+          // Append OCR text to the message content
+          const ocrText = ocrResult.text.trim();
+          message.content = message.content 
+            ? `${message.content}\n\nText extracted from image:\n${ocrText}`
+            : `Text extracted from image:\n${ocrText}`;
+        }
+      } catch (error) {
+        console.error('Error processing image with OCR:', error);
+      } finally {
+        setIsProcessingImage(false);
+      }
     }
 
     setContent('');
@@ -221,13 +238,14 @@ export const ChatInput: FC<Props> = ({
     }
   };
 
-  const handleSelectImage = (file: File) => {
+  const handleSelectImage = async (file: File) => {
     setSelectedImage(file);
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setImagePreview(reader.result as string);
-    };
-    reader.readAsDataURL(file);
+    try {
+      const dataUrl = await fileToDataURL(file);
+      setImagePreview(dataUrl);
+    } catch (error) {
+      console.error('Error converting file to data URL:', error);
+    }
   };
 
   const handleRemoveImage = () => {

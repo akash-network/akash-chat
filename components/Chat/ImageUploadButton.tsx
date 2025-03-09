@@ -1,5 +1,7 @@
-import { FC, useRef } from 'react';
+import React, { FC, useRef, useState } from 'react';
 import Image from 'next/image';
+import { Spinner } from '../Global/Spinner';
+import { processImageWithOCR } from '@/utils/app/image';
 
 interface ImageUploadButtonProps {
   selectedImage: File | null;
@@ -17,36 +19,89 @@ export const ImageUploadButton: FC<ImageUploadButtonProps> = ({
   onRemoveImage,
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [extractedText, setExtractedText] = useState<string | null>(null);
+  const [showTextPreview, setShowTextPreview] = useState(false);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file && file.type.startsWith('image/')) {
       onSelectImage(file);
+      setExtractedText(null);
+      setShowTextPreview(false);
+      
+      // If we have a preview, process it with OCR
+      if (imagePreview) {
+        handleProcessImage(imagePreview);
+      }
     }
   };
+  
+  const handleProcessImage = async (imageData: string) => {
+    try {
+      const result = await processImageWithOCR(imageData);
+      if (result.text) {
+        setExtractedText(result.text.trim());
+      }
+    } catch (error) {
+      console.error('Error processing image preview:', error);
+    }
+  };
+  
+  // Process the image when the preview is available
+  React.useEffect(() => {
+    if (imagePreview && !extractedText && !isProcessingImage) {
+      handleProcessImage(imagePreview);
+    }
+  }, [imagePreview, extractedText, isProcessingImage]);
 
   return (
     <>
       {imagePreview && (
-        <div className="mx-2 mt-2 flex items-center space-x-2 rounded-md border border-neutral-200 p-2 dark:border-neutral-600">
-          <div className="relative h-20 w-20">
-            <Image 
-              src={imagePreview} 
-              alt="Selected image" 
-              width={80}
-              height={80}
-              style={{ objectFit: 'contain' }}
-            />
+        <div className="mx-2 mt-2 flex flex-col rounded-md border border-neutral-200 p-2 dark:border-neutral-600">
+          <div className="flex items-center space-x-2">
+            <div className="relative h-20 w-20">
+              <Image 
+                src={imagePreview} 
+                alt="Selected image" 
+                width={80}
+                height={80}
+                style={{ objectFit: 'contain' }}
+              />
+              {isProcessingImage && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded">
+                  <Spinner size="24" className="text-white" />
+                </div>
+              )}
+            </div>
+            <div className="flex flex-col">
+              <div className="flex space-x-2">
+                <button
+                  className="text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200"
+                  onClick={onRemoveImage}
+                  disabled={isProcessingImage}
+                >
+                  Remove
+                </button>
+                {extractedText && (
+                  <button
+                    className="text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 text-sm"
+                    onClick={() => setShowTextPreview(!showTextPreview)}
+                  >
+                    {showTextPreview ? 'Hide text' : 'Show extracted text'}
+                  </button>
+                )}
+              </div>
+              {isProcessingImage && (
+                <div className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
+                  Extracting text...
+                </div>
+              )}
+            </div>
           </div>
-          <button
-            className="text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200"
-            onClick={onRemoveImage}
-          >
-            Remove
-          </button>
-          {isProcessingImage && (
-            <div className="ml-2 text-sm text-neutral-500 dark:text-neutral-400">
-              Processing image...
+          
+          {showTextPreview && extractedText && (
+            <div className="mt-2 p-2 bg-gray-50 dark:bg-gray-800 rounded text-sm max-h-32 overflow-y-auto">
+              <pre className="whitespace-pre-wrap font-sans">{extractedText}</pre>
             </div>
           )}
         </div>
@@ -56,6 +111,7 @@ export const ImageUploadButton: FC<ImageUploadButtonProps> = ({
         className="absolute right-12 bottom-2.5 rounded-sm p-1 text-neutral-800 opacity-60 hover:bg-neutral-200 hover:text-neutral-900 dark:bg-opacity-50 dark:text-neutral-100 dark:hover:text-neutral-200"
         onClick={() => fileInputRef.current?.click()}
         title="Upload image"
+        disabled={isProcessingImage}
       >
         <svg 
           stroke="currentColor" 
