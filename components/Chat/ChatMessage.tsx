@@ -138,38 +138,23 @@ export const ChatMessage: FC<Props> = memo(
                     </div>
                   </div>
                 ) : (
-                  <div className="prose whitespace-pre-wrap dark:prose-invert">
+                  <div className="w-full">
                     {message.image && (
-                      <div className="mb-4 max-w-[300px]">
+                      <div className="mb-4">
                         <Image 
                           src={message.image} 
                           alt="Uploaded image"
                           width={300}
-                          height={300}
-                          style={{ objectFit: 'contain', maxWidth: '100%', height: 'auto' }}
-                          className="rounded-md"
+                          height={200}
+                          style={{ objectFit: 'contain', maxHeight: '300px' }}
+                          className="rounded-md border border-neutral-200 dark:border-neutral-600"
                         />
-                        {message.context && (
-                          <div className="mt-1 text-xs text-gray-500 dark:text-gray-400 flex items-center">
-                            <svg 
-                              xmlns="http://www.w3.org/2000/svg" 
-                              viewBox="0 0 24 24" 
-                              fill="none" 
-                              stroke="currentColor" 
-                              strokeWidth="2" 
-                              strokeLinecap="round" 
-                              strokeLinejoin="round" 
-                              className="h-3 w-3 mr-1"
-                            >
-                              <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
-                              <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
-                            </svg>
-                            Text extracted from image
-                          </div>
-                        )}
                       </div>
                     )}
-                    {message.content}
+                    
+                    <div className="prose whitespace-pre-wrap dark:prose-invert">
+                      {message.content}
+                    </div>
                   </div>
                 )}
 
@@ -179,8 +164,7 @@ export const ChatMessage: FC<Props> = memo(
                       window.innerWidth < 640
                         ? 'right-3 bottom-1'
                         : 'right-0 top-[26px]'
-                    }
-                    `}
+                    }`}
                     onClick={toggleEditing}
                   >
                     <IconEdit size={20} />

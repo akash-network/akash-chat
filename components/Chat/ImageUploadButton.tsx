@@ -1,7 +1,7 @@
 import React, { FC, useRef, useState } from 'react';
 import Image from 'next/image';
 import { Spinner } from '../Global/Spinner';
-import { processImageWithOCR } from '@/utils/app/image';
+import { processImageWithVision } from '@/utils/app/image';
 
 interface ImageUploadButtonProps {
   selectedImage: File | null;
@@ -18,126 +18,101 @@ export const ImageUploadButton: FC<ImageUploadButtonProps> = ({
   onSelectImage,
   onRemoveImage,
 }) => {
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [extractedText, setExtractedText] = useState<string | null>(null);
-  const [showTextPreview, setShowTextPreview] = useState(false);
-
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file && file.type.startsWith('image/')) {
-      onSelectImage(file);
-      setExtractedText(null);
-      setShowTextPreview(false);
-      
-      // If we have a preview, process it with OCR
-      if (imagePreview) {
-        handleProcessImage(imagePreview);
-      }
-    }
-  };
+  const [imageDescription, setImageDescription] = useState<string | null>(null);
+  const [showDescriptionPreview, setShowDescriptionPreview] = useState(false);
   
   const handleProcessImage = async (imageData: string) => {
     try {
-      const result = await processImageWithOCR(imageData);
-      if (result.text) {
-        setExtractedText(result.text.trim());
+      const result = await processImageWithVision(imageData);
+      if (result.description) {
+        setImageDescription(result.description.trim());
       }
     } catch (error) {
-      console.error('Error processing image preview:', error);
+      console.error('Error processing image with LLaVA model:', error);
     }
   };
   
   // Process the image when the preview is available
   React.useEffect(() => {
-    if (imagePreview && !extractedText && !isProcessingImage) {
+    if (imagePreview && !imageDescription && !isProcessingImage) {
       handleProcessImage(imagePreview);
     }
-  }, [imagePreview, extractedText, isProcessingImage]);
+  }, [imagePreview, imageDescription, isProcessingImage]);
+
+  // Don't render anything if there's no image preview
+  if (!imagePreview) return null;
 
   return (
-    <>
-      {imagePreview && (
-        <div className="mx-2 mt-2 flex flex-col rounded-md border border-neutral-200 p-2 dark:border-neutral-600">
-          <div className="flex items-center space-x-2">
-            <div className="relative h-20 w-20">
-              <Image 
-                src={imagePreview} 
-                alt="Selected image" 
-                width={80}
-                height={80}
-                style={{ objectFit: 'contain' }}
-              />
-              {isProcessingImage && (
-                <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded">
-                  <Spinner size="24" className="text-white" />
-                </div>
-              )}
-            </div>
-            <div className="flex flex-col">
-              <div className="flex space-x-2">
-                <button
-                  className="text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200"
-                  onClick={onRemoveImage}
-                  disabled={isProcessingImage}
-                >
-                  Remove
-                </button>
-                {extractedText && (
-                  <button
-                    className="text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 text-sm"
-                    onClick={() => setShowTextPreview(!showTextPreview)}
-                  >
-                    {showTextPreview ? 'Hide text' : 'Show extracted text'}
-                  </button>
-                )}
-              </div>
-              {isProcessingImage && (
-                <div className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
-                  Extracting text...
-                </div>
-              )}
-            </div>
-          </div>
-          
-          {showTextPreview && extractedText && (
-            <div className="mt-2 p-2 bg-gray-50 dark:bg-gray-800 rounded text-sm max-h-32 overflow-y-auto">
-              <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                This text will be provided as context to the AI model:
-              </div>
-              <pre className="whitespace-pre-wrap font-sans">{extractedText}</pre>
+    <div className="w-full">
+      {/* Image Preview Section */}
+      <div className="mx-2 mb-2 flex items-center rounded-md border border-neutral-200 p-2 dark:border-neutral-600">
+        {/* Thumbnail */}
+        <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-md">
+          <Image 
+            src={imagePreview} 
+            alt="Selected image" 
+            width={64}
+            height={64}
+            style={{ objectFit: 'cover' }}
+            className="rounded-md"
+          />
+          {isProcessingImage && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-md">
+              <Spinner size="16" className="text-white" />
             </div>
           )}
         </div>
-      )}
+        
+        {/* Info and Actions */}
+        <div className="ml-3 flex flex-col flex-grow">
+          <div className="flex justify-between">
+            <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              Image Attached
+            </h4>
+            <button
+              className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 text-sm font-medium"
+              onClick={onRemoveImage}
+              disabled={isProcessingImage}
+            >
+              Remove
+            </button>
+          </div>
+          {isProcessingImage && (
+            <div className="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
+              Analyzing photo...
+            </div>
+          )}
+          {imageDescription && !isProcessingImage && (
+            <div className="mt-1">
+              <button
+                className="text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 text-xs font-medium flex items-center"
+                onClick={() => setShowDescriptionPreview(!showDescriptionPreview)}
+              >
+                {showDescriptionPreview ? 'Hide analysis' : 'Show analysis'}
+                <svg 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  viewBox="0 0 24 24" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  strokeWidth="2" 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
+                  className={`h-3 w-3 ml-1 transition-transform ${showDescriptionPreview ? 'rotate-180' : ''}`}
+                >
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
       
-      <button
-        className="absolute right-12 bottom-2.5 rounded-sm p-1 text-neutral-800 opacity-60 hover:bg-neutral-200 hover:text-neutral-900 dark:bg-opacity-50 dark:text-neutral-100 dark:hover:text-neutral-200"
-        onClick={() => fileInputRef.current?.click()}
-        title="Upload image"
-        disabled={isProcessingImage}
-      >
-        <svg 
-          stroke="currentColor" 
-          fill="none" 
-          strokeWidth="2" 
-          viewBox="0 0 24 24" 
-          strokeLinecap="round" 
-          strokeLinejoin="round" 
-          className="h-4 w-4"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7"></path>
-          <path d="M16 5h6v6"></path>
-          <path d="M8 12l8-8"></path>
-        </svg>
-      </button>
-      <input
-        type="file"
-        accept="image/*"
-        ref={fileInputRef}
-        onChange={handleFileSelect}
-        className="hidden"
-      />
-    </>
+      {/* Analysis Preview */}
+      {showDescriptionPreview && imageDescription && (
+        <div className="mx-2 mb-2 p-2 bg-gray-50 dark:bg-gray-800 rounded-md text-xs max-h-32 overflow-y-auto">
+          <p className="whitespace-pre-wrap font-sans">{imageDescription}</p>
+        </div>
+      )}
+    </div>
   );
 }; 
