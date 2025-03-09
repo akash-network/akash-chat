@@ -15,6 +15,8 @@ import {
 import { PromptList } from './PromptList';
 import { VariableModal } from './VariableModal';
 import { Spinner } from '../Global/Spinner';
+import { ImageUploadButton } from './ImageUploadButton';
+
 
 interface Props {
   messageIsStreaming: boolean;
@@ -46,6 +48,9 @@ export const ChatInput: FC<Props> = ({
   const [promptInputValue, setPromptInputValue] = useState('');
   const [variables, setVariables] = useState<string[]>([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [isProcessingImage, setIsProcessingImage] = useState<boolean>(false);
 
   const promptListRef = useRef<HTMLUListElement | null>(null);
 
@@ -76,16 +81,29 @@ export const ChatInput: FC<Props> = ({
       return;
     }
 
-    if (!content) {
-      alert(t('Please enter a message'));
+    if (!content && !selectedImage) {
       return;
     }
 
-    onSend({ role: 'user', content }, null);
-    setContent('');
+    const message: Message = {
+      role: 'user',
+      content: content || '',
+    };
 
-    if (window.innerWidth < 640 && textareaRef && textareaRef.current) {
-      textareaRef.current.blur();
+    if (selectedImage && imagePreview) {
+      message.image = imagePreview;
+      setIsProcessingImage(true);
+      // Process image if needed, then set isProcessingImage to false when done
+    }
+
+    setContent('');
+    onSend(message, null);
+
+    if (selectedImage) {
+      // Clean up after sending
+      setSelectedImage(null);
+      setImagePreview(null);
+      setIsProcessingImage(false);
     }
   };
 
@@ -203,6 +221,20 @@ export const ChatInput: FC<Props> = ({
     }
   };
 
+  const handleSelectImage = (file: File) => {
+    setSelectedImage(file);
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setImagePreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleRemoveImage = () => {
+    setSelectedImage(null);
+    setImagePreview(null);
+  };
+
   useEffect(() => {
     if (promptListRef.current) {
       promptListRef.current.scrollTop = activePromptIndex * 30;
@@ -280,10 +312,18 @@ export const ChatInput: FC<Props> = ({
             onKeyDown={handleKeyDown}
           />
 
+          <ImageUploadButton
+            selectedImage={selectedImage}
+            imagePreview={imagePreview}
+            isProcessingImage={isProcessingImage}
+            onSelectImage={handleSelectImage}
+            onRemoveImage={handleRemoveImage}
+          />
+
           <button
             className={`absolute right-2 mt-1 mb-1 rounded-lg border bg-black p-0.5 disabled:opacity-20 dark:enabled:bg-white dark:disabled:border-white dark:disabled:bg-white`}
             onClick={handleSend}
-            disabled={content?.trim().length === 0 || messageIsStreaming}
+            disabled={(content?.trim().length === 0 && !selectedImage) || messageIsStreaming}
           >
             {messageIsStreaming ? (
               <Spinner size="20" className="text-white dark:text-black" />

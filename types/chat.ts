@@ -3,6 +3,7 @@ import { LLM } from './llms';
 export interface Message {
   role: Role;
   content: string;
+  image?: string; // Optional image data URL
 }
 
 export type Role = 'assistant' | 'user';

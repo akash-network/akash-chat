@@ -13,6 +13,7 @@ import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import { CodeBlock } from '../Markdown/CodeBlock';
 import { MemoizedReactMarkdown } from '../Markdown/MemoizedReactMarkdown';
+import Image from 'next/image';
 
 interface Props {
   message: Message;
@@ -138,6 +139,18 @@ export const ChatMessage: FC<Props> = memo(
                   </div>
                 ) : (
                   <div className="prose whitespace-pre-wrap dark:prose-invert">
+                    {message.image && (
+                      <div className="mb-4 max-w-[300px]">
+                        <Image 
+                          src={message.image} 
+                          alt="Uploaded image"
+                          width={300}
+                          height={300}
+                          style={{ objectFit: 'contain', maxWidth: '100%', height: 'auto' }}
+                          className="rounded-md"
+                        />
+                      </div>
+                    )}
                     {message.content}
                   </div>
                 )}
