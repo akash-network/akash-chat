@@ -37,6 +37,12 @@ const handler = async (req: Request): Promise<Response> => {
 
     for (let i = messages.length - 1; i >= 0; i--) {
       const message = messages[i];
+      
+      // If the message has context, append it to the content
+      if (message.context) {
+        message.content = `${message.content}\n\n${message.context}`;
+      }
+      
       const tokens = encoding.encode(message.content);
 
       if (tokenCount + tokens.length + 1000 > model.tokenLimit) {

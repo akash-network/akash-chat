@@ -13,6 +13,7 @@ import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import { CodeBlock } from '../Markdown/CodeBlock';
 import { MemoizedReactMarkdown } from '../Markdown/MemoizedReactMarkdown';
+import Image from 'next/image';
 
 interface Props {
   message: Message;
@@ -137,8 +138,23 @@ export const ChatMessage: FC<Props> = memo(
                     </div>
                   </div>
                 ) : (
-                  <div className="prose whitespace-pre-wrap dark:prose-invert">
-                    {message.content}
+                  <div className="w-full">
+                    {message.image && (
+                      <div className="mb-4">
+                        <Image 
+                          src={message.image} 
+                          alt="Uploaded image"
+                          width={300}
+                          height={200}
+                          style={{ objectFit: 'contain', maxHeight: '300px' }}
+                          className="rounded-md border border-neutral-200 dark:border-neutral-600"
+                        />
+                      </div>
+                    )}
+                    
+                    <div className="prose whitespace-pre-wrap dark:prose-invert">
+                      {message.content}
+                    </div>
                   </div>
                 )}
 
@@ -148,8 +164,7 @@ export const ChatMessage: FC<Props> = memo(
                       window.innerWidth < 640
                         ? 'right-3 bottom-1'
                         : 'right-0 top-[26px]'
-                    }
-                    `}
+                    }`}
                     onClick={toggleEditing}
                   >
                     <IconEdit size={20} />

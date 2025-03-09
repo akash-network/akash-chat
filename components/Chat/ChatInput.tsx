@@ -15,6 +15,9 @@ import {
 import { PromptList } from './PromptList';
 import { VariableModal } from './VariableModal';
 import { Spinner } from '../Global/Spinner';
+import { ImageUploadButton } from './ImageUploadButton';
+import { fileToDataURL, processImageWithVision } from '@/utils/app/image';
+
 
 interface Props {
   messageIsStreaming: boolean;
@@ -46,8 +49,12 @@ export const ChatInput: FC<Props> = ({
   const [promptInputValue, setPromptInputValue] = useState('');
   const [variables, setVariables] = useState<string[]>([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [isProcessingImage, setIsProcessingImage] = useState<boolean>(false);
 
   const promptListRef = useRef<HTMLUListElement | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const filteredPrompts = prompts.filter((prompt) =>
     prompt.name.toLowerCase().includes(promptInputValue.toLowerCase()),
@@ -71,21 +78,48 @@ export const ChatInput: FC<Props> = ({
     updatePromptListVisibility(value);
   };
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (messageIsStreaming) {
       return;
     }
 
-    if (!content) {
-      alert(t('Please enter a message'));
+    if (!content && !selectedImage) {
       return;
     }
 
-    onSend({ role: 'user', content }, null);
-    setContent('');
+    const message: Message = {
+      role: 'user',
+      content: content || '',
+    };
 
-    if (window.innerWidth < 640 && textareaRef && textareaRef.current) {
-      textareaRef.current.blur();
+    if (selectedImage && imagePreview) {
+      message.image = imagePreview;
+      setIsProcessingImage(true);
+      
+      try {
+        // Process image with Ollama LLaVA model
+        const visionResult = await processImageWithVision(imagePreview);
+        
+        if (visionResult.description && visionResult.description.trim()) {
+          // Add LLaVA model description as context
+          const description = visionResult.description.trim();
+          message.context = `LLaVA model analysis: ${description}`;
+        }
+      } catch (error) {
+        console.error('Error processing image with LLaVA model:', error);
+      } finally {
+        setIsProcessingImage(false);
+      }
+    }
+
+    setContent('');
+    onSend(message, null);
+
+    if (selectedImage) {
+      // Clean up after sending
+      setSelectedImage(null);
+      setImagePreview(null);
+      setIsProcessingImage(false);
     }
   };
 
@@ -203,6 +237,21 @@ export const ChatInput: FC<Props> = ({
     }
   };
 
+  const handleSelectImage = async (file: File) => {
+    setSelectedImage(file);
+    try {
+      const dataUrl = await fileToDataURL(file);
+      setImagePreview(dataUrl);
+    } catch (error) {
+      console.error('Error converting file to data URL:', error);
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setSelectedImage(null);
+    setImagePreview(null);
+  };
+
   useEffect(() => {
     if (promptListRef.current) {
       promptListRef.current.scrollTop = activePromptIndex * 30;
@@ -244,7 +293,7 @@ export const ChatInput: FC<Props> = ({
             className="absolute top-0 left-0 right-0 mx-auto mb-3 flex w-fit items-center gap-3 rounded border border-neutral-200 bg-white py-2 px-4 text-black hover:opacity-50 dark:border-neutral-600 dark:bg-[#1c1c1c] dark:text-white md:mb-0 md:mt-2"
             onClick={handleStopConversation}
           >
-            <IconPlayerStop size={16} /> {t('Stop Generating')}
+            <IconPlayerStop size={16} /> {t('Stop generating')}
           </button>
         )}
 
@@ -258,9 +307,17 @@ export const ChatInput: FC<Props> = ({
         )}
 
         <div className="relative mx-2 flex w-full flex-grow flex-col rounded-md border border-black/10 bg-white shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:border-gray-500/50 dark:bg-[#1c1c1c] dark:text-white dark:shadow-[0_0_15px_rgba(0,0,0,0.10)] sm:mx-4">
+          <ImageUploadButton
+            selectedImage={selectedImage}
+            imagePreview={imagePreview}
+            isProcessingImage={isProcessingImage}
+            onSelectImage={handleSelectImage}
+            onRemoveImage={handleRemoveImage}
+          />
+
           <textarea
             ref={textareaRef}
-            className="m-0 w-full resize-none border-0 bg-transparent p-0 py-2 pr-8 pl-4 text-black focus:outline-none dark:bg-transparent dark:text-white md:py-3 md:pl-4"
+            className="m-0 w-full resize-none border-0 bg-transparent p-0 py-2 pr-12 pl-4 text-black focus:outline-none dark:bg-transparent dark:text-white md:py-3 md:pl-4"
             style={{
               resize: 'none',
               bottom: `${textareaRef?.current?.scrollHeight}px`,
@@ -271,7 +328,7 @@ export const ChatInput: FC<Props> = ({
                   : 'hidden'
               }`,
             }}
-            placeholder={'Message AkashChat...'}
+            placeholder={selectedImage ? 'Add a message or send the image...' : 'Message AkashChat...'}
             value={content}
             rows={1}
             onCompositionStart={() => setIsTyping(true)}
@@ -280,17 +337,54 @@ export const ChatInput: FC<Props> = ({
             onKeyDown={handleKeyDown}
           />
 
-          <button
-            className={`absolute right-2 mt-1 mb-1 rounded-lg border bg-black p-0.5 disabled:opacity-20 dark:enabled:bg-white dark:disabled:border-white dark:disabled:bg-white`}
-            onClick={handleSend}
-            disabled={content?.trim().length === 0 || messageIsStreaming}
-          >
-            {messageIsStreaming ? (
-              <Spinner size="20" className="text-white dark:text-black" />
-            ) : (
-              <IconArrowUp size={20} className="text-white dark:text-black" />
-            )}
-          </button>
+          <div className="absolute right-2 bottom-2 flex items-center">
+            <button
+              className="rounded-md p-2 text-neutral-800 hover:bg-neutral-100 dark:text-neutral-100 dark:hover:bg-neutral-800 mr-1"
+              onClick={() => fileInputRef.current?.click()}
+              title="Upload image"
+              disabled={isProcessingImage}
+            >
+              <svg 
+                stroke="currentColor" 
+                fill="none" 
+                strokeWidth="2" 
+                viewBox="0 0 24 24" 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                className="h-5 w-5"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                <polyline points="21 15 16 10 5 21"></polyline>
+              </svg>
+            </button>
+
+            <button
+              className={`rounded-md p-1 text-white bg-black hover:bg-black/80 disabled:opacity-20 dark:enabled:bg-white dark:enabled:text-black dark:disabled:border-white dark:disabled:bg-white`}
+              onClick={handleSend}
+              disabled={(content?.trim().length === 0 && !selectedImage) || messageIsStreaming}
+            >
+              {messageIsStreaming ? (
+                <Spinner size="18" className="text-white dark:text-black" />
+              ) : (
+                <IconArrowUp size={18} className="text-white dark:text-black" />
+              )}
+            </button>
+          </div>
+
+          <input
+            type="file"
+            accept="image/*"
+            ref={fileInputRef}
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) {
+                handleSelectImage(file);
+              }
+            }}
+            className="hidden"
+          />
 
           {showPromptList && filteredPrompts.length > 0 && (
             <div className="absolute bottom-12 w-full">
