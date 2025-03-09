@@ -101,6 +101,9 @@ export const ImageUploadButton: FC<ImageUploadButtonProps> = ({
           
           {showTextPreview && extractedText && (
             <div className="mt-2 p-2 bg-gray-50 dark:bg-gray-800 rounded text-sm max-h-32 overflow-y-auto">
+              <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                This text will be provided as context to the AI model:
+              </div>
               <pre className="whitespace-pre-wrap font-sans">{extractedText}</pre>
             </div>
           )}

@@ -4,6 +4,7 @@ export interface Message {
   role: Role;
   content: string;
   image?: string; // Optional image data URL
+  context?: string; // Optional context information (like OCR text)
 }
 
 export type Role = 'assistant' | 'user';

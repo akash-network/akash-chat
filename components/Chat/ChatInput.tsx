@@ -100,11 +100,9 @@ export const ChatInput: FC<Props> = ({
         const ocrResult = await processImageWithOCR(imagePreview);
         
         if (ocrResult.text && ocrResult.text.trim()) {
-          // Append OCR text to the message content
+          // Add OCR text as context instead of appending to content
           const ocrText = ocrResult.text.trim();
-          message.content = message.content 
-            ? `${message.content}\n\nText extracted from image:\n${ocrText}`
-            : `Text extracted from image:\n${ocrText}`;
+          message.context = `Text extracted from image: ${ocrText}`;
         }
       } catch (error) {
         console.error('Error processing image with OCR:', error);
