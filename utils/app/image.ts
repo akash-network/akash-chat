@@ -1,46 +1,4 @@
 /**
- * @param imageData Base64 encoded image data or data URL
- * @returns The extracted text and confidence score
- */
-export const processImageWithOCR = async (imageData: string): Promise<{ 
-  text: string; 
-  confidence: number;
-  error?: string;
-}> => {
-  try {
-    const response = await fetch('/api/ocr', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ image: imageData }),
-    });
-    
-    if (!response.ok) {
-      const errorData = await response.json();
-      return { 
-        text: '', 
-        confidence: 0,
-        error: errorData.error || 'Failed to process image'
-      };
-    }
-    
-    const data = await response.json();
-    return {
-      text: data.text || '',
-      confidence: data.confidence || 0
-    };
-  } catch (error) {
-    console.error('Error processing image with OCR:', error);
-    return { 
-      text: '', 
-      confidence: 0,
-      error: 'Error processing image'
-    };
-  }
-};
-
-/**
  * Processes an image with Ollama LLaVA model to get a detailed description
  * @param imageData Base64 encoded image data or data URL
  * @returns The description from the LLaVA model
