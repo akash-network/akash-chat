@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  akash-llm-gateway:
+    build: .
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - ENDPOINTS=[{"url":"http://xyz.com","apiKey":"xyz","priority":1,"weight":1},{"url":"http://xyz.com","apiKey":"xyz","priority":1,"weight":1}]
+      - PROXY_API_KEY=your-proxy-api-key-here
+      - FILE_LOGGING=false
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3001/v1/models"]
+      interval: 30s
+      timeout: 10s
+      retries: 3 
