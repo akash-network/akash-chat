@@ -3,12 +3,12 @@
 
 import { AlertCircle, LoaderCircle } from 'lucide-react';
 import { AkashChatLogo } from '@/components/branding/akash-chat-logo';
-import { ChatSidebar } from '@/components/chat-sidebar';
+import { ChatSidebar } from '@/components/chat/chat-sidebar';
 import { cn } from '@/lib/utils';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useSwipeable } from 'react-swipeable';
-import { ChatHeader } from '@/components/chat-header';
+import { ChatHeader } from '@/components/chat/chat-header';
 import { useWindowSize } from 'usehooks-ts';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";

@@ -26,8 +26,6 @@ export async function generateMetadata(
   if (model.tokenLimit) capabilities.push(`${(model.tokenLimit / 1000).toFixed(0)}K context window`);
   
   const modelFamily = model.id.split('-')[0];
-      // todo: change this to a more accurate description
-
   const detailedDescription = model.description 
     ? `${model.description}${capabilities.length ? '. ' : ''}`
     : '';

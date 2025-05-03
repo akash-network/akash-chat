@@ -5,12 +5,12 @@ import { cn } from '@/lib/utils';
 import { Message } from 'ai';
 import { useState, useEffect, useRef } from 'react';
 import { Folder } from '@/hooks/use-folders';
-import { DraggableChatItem } from './draggable-chat-item';
-import { DroppableFolder } from './droppable-folder';
+import { DraggableChatItem } from '../draggable-chat-item';
+import { DroppableFolder } from '../droppable-folder';
 import { useDrop } from 'react-dnd';
 import { FolderPlus, CirclePlus, PanelRightOpen, Heart, CircleHelp, Ellipsis, PlugZap, Globe, ChartBarBig, ChartColumnIncreasing, Settings, Package } from 'lucide-react';
 import Link from 'next/link';
-import { Button } from './ui/button';
+import { Button } from '../ui/button';
 import { useRouter, usePathname } from 'next/navigation';
 
 interface ChatHistory {
@@ -106,6 +106,7 @@ export function ChatSidebar({
   };
 
   const handleMenuInteraction = (menu: 'importExport' | 'resources' | 'follow' | 'moreInfo', isHovering: boolean = false) => {
+    console.log('menu', menu);
     if (isMobile) {
       // On mobile, toggle the menu on click
       switch (menu) {
@@ -645,6 +646,7 @@ export function ChatSidebar({
                   <Button
                     variant="ghost"
                     className="w-full justify-start gap-2 h-8 px-2 text-sm font-light hover:bg-white dark:hover:bg-accent hover:text-accent-foreground"
+                    onClick={() => isMobile && setSidebarOpen(false)}
                   >
                     <Package className="w-3.5 h-3.5" />
                     <span>Models</span>

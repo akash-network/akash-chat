@@ -2,25 +2,11 @@ import { cn } from "@/lib/utils";
 import { Textarea } from "@/components/ui/textarea";
 import { Mic, MicOff, LoaderCircle, Paperclip, X } from 'lucide-react';
 import { useWebSocketTranscription } from '@/hooks/use-websocket-transcription';
-import { Button } from "./ui/button";
+import { Button } from "../ui/button";
 import { useState, useRef, useEffect } from "react";
-import { FileUpload } from './file-upload';
-import * as pdfjsLib from 'pdfjs-dist';
-import { GlobalWorkerOptions } from 'pdfjs-dist';
-
-// Initialize PDF.js worker
-if (typeof window !== 'undefined') {
-  GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.worker.min.mjs`;
-}
-
-
-interface ContextFile {
-  id: string;
-  name: string;
-  content: string;
-  type: string;
-  preview?: string;
-}
+import { FileUpload } from '../file-upload';
+import { handleFileSelect } from '@/utils/file-handler';
+import { ContextFile } from "@/app/context/ChatContext";
 
 interface ChatInputProps {
   input: string;
@@ -34,23 +20,6 @@ interface ChatInputProps {
   contextFiles?: ContextFile[];
   isInitialized?: boolean;
 }
-
-const extractPdfText = async (file: File): Promise<string> => {
-  const arrayBuffer = await file.arrayBuffer();
-  const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-  let fullText = '';
-  
-  for (let i = 1; i <= pdf.numPages; i++) {
-    const page = await pdf.getPage(i);
-    const textContent = await page.getTextContent();
-    const pageText = textContent.items
-      .map((item: any) => item.str)
-      .join(' ');
-    fullText += pageText + '\n\n';
-  }
-  
-  return fullText;
-};
 
 export function ChatInput({
   input,
@@ -101,49 +70,9 @@ export function ChatInput({
     }
   };
 
-  const handleFileSelect = async (files: File[]) => {
+  const handleFilesSelected = async (files: File[]) => {
     if (onFilesChange) {
-      const newFiles = await Promise.all(
-        files.map(async (file) => {
-          let content: string;
-          let type = file.type || 'text/plain';
-          const extension = file.name.split('.').pop()?.toLowerCase();
-
-          // Handle different file types
-          if (extension === 'pdf' || type === 'application/pdf') {
-            type = 'application/pdf';
-            content = await extractPdfText(file);
-          } else {
-            content = await file.text();
-          }
-
-          const preview = content.slice(0, 500) + (content.length > 500 ? '...' : '');
-          
-          // Set the correct MIME type based on extension
-          if (extension) {
-            switch (extension) {
-              case 'md':
-                type = 'text/markdown';
-                break;
-              case 'json':
-                type = 'application/json';
-                break;
-              case 'txt':
-                type = 'text/plain';
-                break;
-            }
-          }
-          
-          return {
-            id: Math.random().toString(36).slice(2),
-            name: file.name,
-            content,
-            type,
-            preview,
-          };
-        })
-      );
-
+      const newFiles = await handleFileSelect(files);
       const updatedFiles = [...contextFiles, ...newFiles];
       onFilesChange(updatedFiles);
       setShowFileUpload(false);
@@ -194,7 +123,7 @@ export function ChatInput({
             {showFileUpload && (
               <div className="pt-2">
                 <FileUpload
-                  onFileSelect={handleFileSelect}
+                  onFileSelect={handleFilesSelected}
                   acceptedFileTypes={['application/pdf', 'text/plain', 'text/markdown', 'application/json']}
                   maxFiles={5 - contextFiles.length}
                   className="w-full"

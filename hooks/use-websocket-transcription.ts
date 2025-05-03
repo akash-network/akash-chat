@@ -35,7 +35,7 @@ export function useWebSocketTranscription({
 
       // Check if the backend can provide a WebSocket URL
       try {
-        const response = await fetch('/api/transcription');
+        const response = await fetch('/api/transcription/');
         if (!response.ok) {
           console.warn('Backend transcription API is not available');
           return false;

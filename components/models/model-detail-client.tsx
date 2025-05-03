@@ -13,7 +13,7 @@ import { ModelConfig } from '@/components/model-config';
 
 interface ModelDetailClientProps {
   modelId: string;
-  model?: Model; // Optional prop, will be passed from server component
+  model?: Model;
 }
 
 export function ModelDetailClient({ modelId, model: serverModel }: ModelDetailClientProps) {

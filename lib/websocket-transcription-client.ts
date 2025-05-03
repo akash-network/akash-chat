@@ -420,7 +420,7 @@ export class WebSocketTranscriptionClient {
   private async getWebSocketInfos(): Promise<{ url: string, model: string } | null> {
     try {
       if (typeof window !== 'undefined') {
-        const response = await fetch('/api/transcription');
+        const response = await fetch('/api/transcription/');
         if (!response.ok) {
           throw new Error('Failed to fetch WebSocket endpoint');
         }

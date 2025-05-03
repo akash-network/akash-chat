@@ -1,18 +1,13 @@
 'use client';
 
 import { useChatContext } from "@/app/context/ChatContext";
-import { Message } from '@/components/message';
-import { AkashChatLogo } from '@/components/branding/akash-chat-logo';
 import { AlertCircle, Loader2, X } from "lucide-react";
-import { motion } from "framer-motion";
 import { Model } from "@/app/config/models";
 import { useRouter } from "next/navigation";
-import { use, useEffect, useState, useRef } from "react";
+import { use, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { AI_NOTICE } from '@/app/config/genimg';
 import { ModelConfig } from '@/components/model-config';
-import { ChatInput } from '@/components/chat-input';
-import { useWindowSize } from "usehooks-ts";
+import { ChatMessages } from '@/components/chat/chat-messages';
 
 export default function ModelDetailPage( {params}: any) {
   const promiseParams: any = use(params);
@@ -53,45 +48,10 @@ export default function ModelDetailPage( {params}: any) {
     setTopP
   } = useChatContext();
 
-  // Refs
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const messagesContainerRef = useRef<HTMLDivElement>(null);
-  
   // Local state
   const [isModelLoading, setIsModelLoading] = useState(true);
   const [model, setModel] = useState<Model | null>(null);
   const [modelNotFound, setModelNotFound] = useState(false);
-  const [autoScroll, setAutoScroll] = useState(true);
-  const { width: windowWidth } = useWindowSize();
-  const isMobile = windowWidth ? windowWidth < 768 : false;
-
-  // Utility functions
-  const scrollToBottom = () => {
-    const container = messagesContainerRef.current;
-    if (container && autoScroll) {
-      container.scrollTop = container.scrollHeight;
-    }
-  };
-
-  // Handle scroll events to toggle auto-scroll
-  const handleScroll = () => {
-    const container = messagesContainerRef.current;
-    if (container) {
-      const { scrollTop, scrollHeight, clientHeight } = container;
-      const threshold = isMobile ? 50 : 20;
-      const isAtBottom = Math.abs(scrollHeight - scrollTop - clientHeight) < threshold;
-      if (isAtBottom !== autoScroll) {
-        setAutoScroll(isAtBottom);
-      }
-    }
-  };
-
-  // Effect to scroll to bottom when messages change
-  useEffect(() => {
-    if (messages.length > 0) {
-      scrollToBottom();
-    }
-  }, [messages]);
 
   // Effect to set model on mount
   useEffect(() => {
@@ -233,103 +193,22 @@ export default function ModelDetailPage( {params}: any) {
         </div>
       )}
       
-      {/* Chat Messages - same as main page */}
-      <div
-        ref={messagesContainerRef}
-        className="flex-1 overflow-auto p-2 md:p-4 bg-background dark:bg-background"
-        id="messages-container"
-        onScroll={handleScroll}
-      >
-        <div className="max-w-3xl mx-auto space-y-4">
-          {messages.length === 0 ? (
-            <div className="h-full flex flex-col items-center justify-center min-h-[calc(100vh-200px)] px-4">
-              <div className="mb-6 sm:mb-8">
-                <AkashChatLogo className="w-48 sm:w-64 md:w-80" />
-              </div>
-              {/* Add model-specific welcome message */}
-              <div className="w-full max-w-xl mb-3 sm:mb-4">
-                <ChatInput
-                  input={input}
-                  isLoading={isLoading}
-                  onSubmit={handleSubmit}
-                  onChange={handleInputChange}
-                  onFilesChange={setContextFiles}
-                  contextFiles={contextFiles}
-                  className="relative"
-                  isInitialized={sessionInitialized}
-                />
-              </div>
-              <p className="text-xs sm:text-sm text-muted-foreground text-center px-4">
-                {AI_NOTICE}
-              </p>
-            </div>
-          ) : (
-            <>
-              {messages.map((message, index) => (
-                <Message
-                  key={message.id}
-                  message={message}
-                  messageIndex={index}
-                  isLoading={isLoading && message.id === messages[messages.length - 1]?.id}
-                  onRegenerate={message.role === 'assistant' ? async () => {
-                    const precedingUserMessage = messages[index - 1];
-                    if (precedingUserMessage?.role === 'user') {
-                      reload();
-                    }
-                  } : undefined}
-                  onBranch={selectedChat && !isLoading ? () => handleBranch(index) : undefined}
-                />
-              ))}
-              {modelError && (
-                <motion.div
-                  className="flex items-center gap-3 p-4 text-destructive bg-destructive/10 rounded-lg"
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                >
-                  <AlertCircle className="h-5 w-5 shrink-0" />
-                  <p className="flex-1">{modelError}</p>
-                  {messages.length > 0 && messages[messages.length - 1].role === 'user' && (
-                    <button
-                      onClick={() => {
-                        reload();
-                      }}
-                      className="flex items-center gap-2 px-3 py-1.5 text-sm hover:bg-destructive/20 rounded-md transition-colors"
-                      disabled={isLoading}
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                      </svg>
-                      Try again
-                    </button>
-                  )}
-                </motion.div>
-              )}
-              <div ref={messagesEndRef} />
-            </>
-          )}
-        </div>
-      </div>
-
-      {/* Input Form - Only show when there are messages */}
-      {messages.length > 0 && (
-        <div className="flex-none sticky bottom-0 border-t border-border p-2 md:p-4 bg-background">
-          <ChatInput
-            input={input}
-            isLoading={isLoading}
-            onSubmit={handleSubmit}
-            onChange={handleInputChange}
-            onStop={stop}
-            onFilesChange={setContextFiles}
-            contextFiles={contextFiles}
-            className="max-w-3xl mx-auto"
-            showStopButton
-            isInitialized={sessionInitialized}
-          />
-          <p className="text-xs text-muted-foreground text-center mt-2">
-            {AI_NOTICE}
-          </p>
-        </div>
-      )}
+      <ChatMessages
+        messages={messages}
+        input={input}
+        isLoading={isLoading}
+        contextFiles={contextFiles}
+        setContextFiles={setContextFiles}
+        handleInputChange={handleInputChange}
+        handleSubmit={handleSubmit}
+        stop={stop}
+        reload={reload}
+        modelError={modelError}
+        selectedChat={selectedChat}
+        handleBranch={handleBranch}
+        sessionInitialized={sessionInitialized}
+        showStopButton
+      />
 
       <ModelConfig
         open={isConfigOpen}

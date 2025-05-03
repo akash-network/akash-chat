@@ -1,57 +1,52 @@
-'use client';
-
-import { useRef, useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { AlertCircle } from 'lucide-react';
-import { AkashChatLogo } from '@/components/branding/akash-chat-logo';
 import { Message } from '@/components/message';
-import { ChatInput } from '@/components/chat-input';
+import { AkashChatLogo } from '@/components/branding/akash-chat-logo';
+import { AlertCircle } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { ChatInput } from '@/components/chat/chat-input';
 import { AI_NOTICE } from '@/app/config/genimg';
-import type { Message as AIMessage } from 'ai';
+import { useRef, useState, useEffect } from 'react';
 import { useWindowSize } from 'usehooks-ts';
+import { Message as AIMessage } from 'ai';
 
-interface ChatContentProps {
+interface ChatMessagesProps {
   messages: AIMessage[];
   input: string;
+  isLoading: boolean;
+  contextFiles: any[];
+  setContextFiles: (files: any[]) => void;
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>) => void;
   handleSubmit: (e: React.FormEvent<HTMLFormElement>) => Promise<void>;
-  isLoading: boolean;
   stop: () => void;
   reload: () => void;
   modelError: string | null;
-  setModelError: (error: string | null) => void;
-  contextFiles: any[];
-  setContextFiles: (files: any[]) => void;
-  handleBranch: (index: number) => void;
   selectedChat: string | null;
+  handleBranch: (index: number) => void;
   sessionInitialized: boolean;
-  setMessages: (messages: AIMessage[]) => void;
+  showStopButton?: boolean;
 }
 
-export function ChatContent({
+export function ChatMessages({
   messages,
   input,
+  isLoading,
+  contextFiles,
+  setContextFiles,
   handleInputChange,
   handleSubmit,
-  isLoading,
   stop,
   reload,
   modelError,
-  setModelError,
-  contextFiles,
-  setContextFiles,
-  handleBranch,
   selectedChat,
+  handleBranch,
   sessionInitialized,
-  setMessages
-}: ChatContentProps) {
+  showStopButton = false
+}: ChatMessagesProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const [autoScroll, setAutoScroll] = useState(true);
   const { width: windowWidth } = useWindowSize();
   const isMobile = windowWidth ? windowWidth < 768 : false;
 
-  // Utility functions
   const scrollToBottom = () => {
     const container = messagesContainerRef.current;
     if (container && autoScroll) {
@@ -59,21 +54,18 @@ export function ChatContent({
     }
   };
 
-  // Handle scroll events to toggle auto-scroll
   const handleScroll = () => {
     const container = messagesContainerRef.current;
     if (container) {
       const { scrollTop, scrollHeight, clientHeight } = container;
       const threshold = isMobile ? 50 : 20;
       const isAtBottom = Math.abs(scrollHeight - scrollTop - clientHeight) < threshold;
-
       if (isAtBottom !== autoScroll) {
         setAutoScroll(isAtBottom);
       }
     }
   };
 
-  // Effect to scroll to bottom when messages change
   useEffect(() => {
     if (messages.length > 0) {
       scrollToBottom();
@@ -82,7 +74,6 @@ export function ChatContent({
 
   return (
     <>
-      {/* Chat Messages */}
       <div
         ref={messagesContainerRef}
         onScroll={handleScroll}
@@ -123,7 +114,6 @@ export function ChatContent({
                   onRegenerate={message.role === 'assistant' ? async () => {
                     const precedingUserMessage = messages[index - 1];
                     if (precedingUserMessage?.role === 'user') {
-                      setMessages(messages.slice(0, index));
                       reload();
                     }
                   } : undefined}
@@ -141,7 +131,6 @@ export function ChatContent({
                   {messages.length > 0 && messages[messages.length - 1].role === 'user' && (
                     <button
                       onClick={() => {
-                        setModelError(null);
                         reload();
                       }}
                       className="flex items-center gap-2 px-3 py-1.5 text-sm hover:bg-destructive/20 rounded-md transition-colors"
@@ -161,7 +150,6 @@ export function ChatContent({
         </div>
       </div>
 
-      {/* Input Form - Only show when there are messages */}
       {messages.length > 0 && (
         <div className="flex-none border-t border-border p-2 md:p-4 bg-background">
           <ChatInput
@@ -173,7 +161,7 @@ export function ChatContent({
             onFilesChange={setContextFiles}
             contextFiles={contextFiles}
             className="max-w-3xl mx-auto"
-            showStopButton
+            showStopButton={showStopButton}
             isInitialized={sessionInitialized}
           />
           <p className="text-xs text-muted-foreground text-center mt-2">
