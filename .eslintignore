@@ -1,0 +1,17 @@
+.next
+node_modules
+out
+public
+*.d.ts
+*.js.map
+*.css
+*.svg
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.ico
+*.woff
+*.woff2
+*.ttf
+*.eot 

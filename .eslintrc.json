@@ -1,3 +1,63 @@
 {
-  "extends": "next/core-web-vitals"
-}
+  "extends": [
+    "next/core-web-vitals",
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:react/recommended"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "plugins": [
+    "@typescript-eslint",
+    "react",
+    "import"
+  ],
+  "rules": {
+    "@typescript-eslint/no-unused-vars": ["error", { 
+      "argsIgnorePattern": "^_|props|node",
+      "varsIgnorePattern": "^_",
+      "ignoreRestSiblings": true
+    }],
+    "@typescript-eslint/no-explicit-any": "error",
+    "@typescript-eslint/consistent-type-definitions": ["error", "interface"],
+    "@typescript-eslint/no-non-null-assertion": "warn",
+    "react/prop-types": "off",
+    "react/react-in-jsx-scope": "off",
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn",
+    "react/no-unescaped-entities": "warn",
+    "react/no-unused-prop-types": "warn",
+    "react/jsx-no-duplicate-props": "error",
+    "react/jsx-key": ["error", { "checkFragmentShorthand": true }],
+    "no-console": ["warn", { "allow": ["warn", "error", "info"] }],
+    "prefer-const": "error",
+    "no-var": "error",
+    "no-multiple-empty-lines": ["error", { "max": 1, "maxEOF": 0 }],
+    "eqeqeq": ["error", "always"],
+    "curly": ["error", "all"],
+    "no-unused-expressions": "error",
+    "import/no-unresolved": "off",
+    "import/order": ["error", {
+      "groups": ["builtin", "external", "internal", "parent", "sibling", "index"],
+      "newlines-between": "always",
+      "alphabetize": { "order": "asc" }
+    }],
+    "@typescript-eslint/ban-types": "warn",
+    "@typescript-eslint/ban-ts-comment": ["warn", { "minimumDescriptionLength": 3 }],
+    "@next/next/no-img-element": "warn",
+    "no-empty": "warn",
+    "@typescript-eslint/no-var-requires": "warn",
+    "no-empty-pattern": "warn"
+  },
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
+  },
+  "ignorePatterns": [
+    "node_modules/",
+    ".next/",
+    "out/",
+    "public/",
+    "*.config.js"
+  ]
+} 

@@ -1,0 +1,62 @@
+---
+version: "2.0"
+services:
+  akashchat:
+    image: >-
+      ghcr.io/akash-network/akash-chat:latest
+    expose:
+      - port: 3000
+        as: 80
+        accept:
+          - chat.akash.network
+        to:
+          - global: true
+    env:
+      - API_KEY=sk-...
+      - API_ENDPOINT=https://chatapi.akash.network/api/v1
+      - DEFAULT_MODEL=Meta-Llama-3-3-70B-Instruct
+      - REDIS_URL=redis://redis:6379
+  redis:
+    image: redislabs/redismod
+    expose:
+      - port: 6379
+        as: 6379
+        to:
+          - global: false
+          - service: akashchat
+profiles:
+  compute:
+    akashchat:
+      resources:
+        cpu:
+          units: 2
+        memory:
+          size: 4Gi
+        storage:
+          - size: 2Gi
+    redis:
+      resources:
+        cpu:
+          units: 1
+        memory:
+          size: 1Gi
+        storage:
+          - size: 1Gi
+  placement:
+    akash:
+      pricing:
+        akashchat:
+          denom: uakt
+          amount: 10000
+        redis:
+          denom: uakt
+          amount: 10000
+deployment:
+  akashchat:
+    akash:
+      profile: akashchat
+      count: 1
+  redis:
+    akash:
+      profile: redis
+      count: 1

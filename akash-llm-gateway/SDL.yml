@@ -1,0 +1,36 @@
+---
+version: "2.0"
+services:
+  llm-gateway:
+    image: ghcr.io/zjuuu/akash-llm-gateway:latest
+    expose:
+      - port: 3000
+        as: 3000
+        to:
+          - global: true
+    env:
+      # - PORT=3001 # default is 3000
+      - ENDPOINTS=[{"url":"https://chatapi.akash.network/api","apiKey":"xxxxx","priority":1,"weight":1},{"url":"your-llm-endpoint-2","apiKey":"xxxxx","priority":1,"weight":1}]
+      - PROXY_API_KEY=xxxxx
+      - FILE_LOGGING=false # toggle file logging
+profiles:
+  compute:
+    llm-gateway:
+      resources:
+        cpu:
+          units: 2
+        memory:
+          size: 4gi
+        storage:
+          - size: 5Gi
+  placement:
+    dcloud:
+      pricing:
+        llm-gateway:
+          denom: uakt
+          amount: 10000
+deployment:
+  llm-gateway:
+    dcloud:
+      profile: llm-gateway
+      count: 1
