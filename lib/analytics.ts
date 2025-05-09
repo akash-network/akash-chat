@@ -1,9 +1,9 @@
-import { sendGTMEvent } from "@next/third-parties/google";
+import { sendGAEvent } from "@next/third-parties/google";
 
 export const trackEvent = {
   // File uploads
   fileUpload: (fileType: string) => {
-    sendGTMEvent({
+    sendGAEvent({
       event: 'file_upload',
       type: fileType  // 'pdf', 'txt', etc.
     });
@@ -11,7 +11,7 @@ export const trackEvent = {
 
   // Speech to text
   speechToText: (action: 'start' | 'complete') => {
-    sendGTMEvent({
+    sendGAEvent({
       event: 'speech_to_text',
       action: action
     });
@@ -19,7 +19,7 @@ export const trackEvent = {
 
   // Model configuration
   configureModel: () => {
-    sendGTMEvent({
+    sendGAEvent({
       event: 'configure_model',
     });
   }

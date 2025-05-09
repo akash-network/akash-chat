@@ -1,5 +1,5 @@
 import './globals.css';
-import { GoogleTagManager } from '@next/third-parties/google';
+import { GoogleAnalytics } from '@next/third-parties/google';
 import { Inter } from 'next/font/google';
 import { ThemeProvider } from 'next-themes';
 
@@ -115,7 +115,7 @@ export default function RootLayout({
             
             {children}
           </ChatProvider>
-          <GoogleTagManager gtmId={process.env.NEXT_PUBLIC_GA_ID ?? ''} />
+          <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID ?? ''} />
         </ThemeProvider>
       </body>
     </html>
