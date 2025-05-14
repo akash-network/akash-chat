@@ -146,7 +146,7 @@ export function ChatSidebar({
     }
   };
 
-  const [{}, dropRef] = useDrop<{ id: string; type: string }, void, { isOver: boolean }>(() => ({
+  const [{ }, dropRef] = useDrop<{ id: string; type: string }, void, { isOver: boolean }>(() => ({
     accept: 'CHAT',
     drop: (item, monitor) => {
       if (monitor.isOver({ shallow: true })) {
@@ -162,12 +162,12 @@ export function ChatSidebar({
   dropRef(dropRefElement);
 
   const handleChatSelect = (chatId: string) => {
-    if (isLoading) {return;}
+    if (isLoading) { return; }
     const chat = chats.find(c => c.id === chatId);
     if (chat) {
       setSelectedChat(chatId);
       onSelectChat(chat.messages);
-      
+
       // Check if we're on a model detail page
       const isModelPage = pathname && pathname.startsWith('/models/') && !pathname.endsWith('/chat/');
       const isChatPage = pathname && pathname.endsWith('/chat/');
@@ -178,7 +178,7 @@ export function ChatSidebar({
         // If on chat page and the chat has a model, update the URL to reflect the model
         router.push(`/models/${chat.model.id}/chat/`);
       }
-      
+
       if (isMobile) {
         setSidebarOpen(false);
       }
@@ -187,7 +187,7 @@ export function ChatSidebar({
 
   const handleRenameSubmit = (chatId: string, newName: string) => {
     const trimmedName = newName.trim();
-    if (!trimmedName) {return;}
+    if (!trimmedName) { return; }
 
     // Limit name length to 20 characters
     const limitedName = trimmedName.length > 20
@@ -225,7 +225,7 @@ export function ChatSidebar({
               onSubmit={(e) => {
                 e.preventDefault();
                 const input = e.currentTarget.querySelector('input');
-                if (input) {handleRenameSubmit(chat.id, input.value);}
+                if (input) { handleRenameSubmit(chat.id, input.value); }
               }}
               className="p-2"
             >
@@ -379,7 +379,7 @@ export function ChatSidebar({
                       // Find the latest message and get its timestamp
                       const latestMessage = chat.messages[chat.messages.length - 1];
                       // Use createdAt if available, otherwise fallback to id
-                      return latestMessage.createdAt 
+                      return latestMessage.createdAt
                         ? new Date(latestMessage.createdAt).getTime()
                         : 0;
                     };
@@ -403,7 +403,7 @@ export function ChatSidebar({
                         // Sort by latest message timestamp
                         sortKey: getLatestMessageTimestamp(chat)
                       }));
-                    
+
                     // Get folders
                     const folderItems = folders.map(folder => ({
                       type: 'folder' as const,
@@ -411,38 +411,38 @@ export function ChatSidebar({
                       // Sort by latest activity in any chat within the folder
                       sortKey: getFolderLatestActivity(folder.id)
                     }));
-                    
+
                     // Combine and sort by the most recent activity timestamp (newest first)
                     const combinedItems = [...ungroupedChats, ...folderItems]
                       .sort((a, b) => b.sortKey - a.sortKey);
-                    
+
                     // Function to get a readable time category for a timestamp
                     const getTimeCategory = (timestamp: number): string => {
-                      if (timestamp === 0) return "No Recent Activity";
-                      
+                      if (timestamp === 0) { return "No Recent Activity"; }
+
                       const now = new Date();
                       const date = new Date(timestamp);
-                      
+
                       // Reset hours to compare just the dates
                       const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
                       const yesterday = new Date(today);
                       yesterday.setDate(yesterday.getDate() - 1);
-                      
+
                       // Calculate start of this week (starting Sunday)
                       const thisWeekStart = new Date(today);
                       thisWeekStart.setDate(thisWeekStart.getDate() - thisWeekStart.getDay());
-                      
+
                       // Calculate start of last week
                       const lastWeekStart = new Date(thisWeekStart);
                       lastWeekStart.setDate(lastWeekStart.getDate() - 7);
-                      
+
                       // Calculate 30 days ago
                       const thirtyDaysAgo = new Date(today);
                       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-                      
+
                       // Simple date comparison
                       const itemDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-                      
+
                       if (itemDate.getTime() === today.getTime()) {
                         return "Today";
                       } else if (itemDate.getTime() === yesterday.getTime()) {
@@ -462,10 +462,10 @@ export function ChatSidebar({
                         return `${monthNames[date.getMonth()]} ${date.getFullYear()}`;
                       }
                     };
-                    
+
                     // Group items by time category
                     const itemsByCategory: Record<string, typeof combinedItems> = {};
-                    
+
                     combinedItems.forEach(item => {
                       const category = getTimeCategory(item.sortKey);
                       if (!itemsByCategory[category]) {
@@ -473,22 +473,22 @@ export function ChatSidebar({
                       }
                       itemsByCategory[category].push(item);
                     });
-                    
+
                     // Order of categories to display
                     const categoryOrder = [
-                      "Today", 
-                      "Yesterday", 
-                      "This Week", 
-                      "Last Week", 
+                      "Today",
+                      "Yesterday",
+                      "This Week",
+                      "Last Week",
                       "Previous 30 Days",
                       // Months will be sorted alphabetically after these
                     ];
-                    
+
                     // Sort the categories
                     const sortedCategories = Object.keys(itemsByCategory).sort((a, b) => {
                       const indexA = categoryOrder.indexOf(a);
                       const indexB = categoryOrder.indexOf(b);
-                      
+
                       // If both are in our predefined order
                       if (indexA !== -1 && indexB !== -1) {
                         return indexA - indexB;
@@ -500,7 +500,7 @@ export function ChatSidebar({
                       // Otherwise sort alphabetically (for month categories)
                       return a.localeCompare(b);
                     });
-                    
+
                     // Render categories and their items
                     return (
                       <>
@@ -516,7 +516,7 @@ export function ChatSidebar({
                                     onSubmit={(e) => {
                                       e.preventDefault();
                                       const input = e.currentTarget.querySelector('input');
-                                      if (input) {handleRenameSubmit(chat.id, input.value);}
+                                      if (input) { handleRenameSubmit(chat.id, input.value); }
                                     }}
                                     className="p-2"
                                   >
@@ -557,7 +557,7 @@ export function ChatSidebar({
                                     onSubmit={(e) => {
                                       e.preventDefault();
                                       const input = e.currentTarget.querySelector('input');
-                                      if (input) {handleFolderRenameSubmit(folder.id, input.value);}
+                                      if (input) { handleFolderRenameSubmit(folder.id, input.value); }
                                     }}
                                     className="mt-4"
                                   >
