@@ -416,85 +416,180 @@ export function ChatSidebar({
                     const combinedItems = [...ungroupedChats, ...folderItems]
                       .sort((a, b) => b.sortKey - a.sortKey);
                     
-                    return combinedItems.map(combinedItem => {
-                      if (combinedItem.type === 'chat') {
-                        const chat = combinedItem.item;
-                        return editingChatId === chat.id ? (
-                          <form
-                            key={`chat-${chat.id}`}
-                            onSubmit={(e) => {
-                              e.preventDefault();
-                              const input = e.currentTarget.querySelector('input');
-                              if (input) {handleRenameSubmit(chat.id, input.value);}
-                            }}
-                            className="p-2"
-                          >
-                            <input
-                              type="text"
-                              defaultValue={chat.name}
-                              maxLength={20}
-                              className="w-full bg-background p-1 rounded border border-input"
-                              autoFocus
-                              onBlur={(e) => handleRenameSubmit(chat.id, e.target.value)}
-                            />
-                          </form>
-                        ) : (
-                          <DraggableChatItem
-                            key={`chat-${chat.id}`}
-                            chat={chat}
-                            isSelected={selectedChat === chat.id}
-                            onSelect={() => handleChatSelect(chat.id)}
-                            onRename={() => setEditingChatId(chat.id)}
-                            onDelete={() => {
-                              onDeleteChat(chat.id);
-                              if (selectedChat === chat.id) {
-                                onNewChat();
-                              }
-                            }}
-                            isLoading={isLoading}
-                            setHoveredFolder={setHoveredFolder}
-                            hoveredFolder={hoveredFolder}
-                            allChats={chats}
-                          />
-                        );
+                    // Function to get a readable time category for a timestamp
+                    const getTimeCategory = (timestamp: number): string => {
+                      if (timestamp === 0) return "No Recent Activity";
+                      
+                      const now = new Date();
+                      const date = new Date(timestamp);
+                      
+                      // Reset hours to compare just the dates
+                      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                      const yesterday = new Date(today);
+                      yesterday.setDate(yesterday.getDate() - 1);
+                      
+                      // Calculate start of this week (starting Sunday)
+                      const thisWeekStart = new Date(today);
+                      thisWeekStart.setDate(thisWeekStart.getDate() - thisWeekStart.getDay());
+                      
+                      // Calculate start of last week
+                      const lastWeekStart = new Date(thisWeekStart);
+                      lastWeekStart.setDate(lastWeekStart.getDate() - 7);
+                      
+                      // Calculate 30 days ago
+                      const thirtyDaysAgo = new Date(today);
+                      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+                      
+                      // Simple date comparison
+                      const itemDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+                      
+                      if (itemDate.getTime() === today.getTime()) {
+                        return "Today";
+                      } else if (itemDate.getTime() === yesterday.getTime()) {
+                        return "Yesterday";
+                      } else if (itemDate >= thisWeekStart) {
+                        return "This Week";
+                      } else if (itemDate >= lastWeekStart) {
+                        return "Last Week";
+                      } else if (itemDate >= thirtyDaysAgo) {
+                        return "Previous 30 Days";
                       } else {
-                        // It's a folder
-                        const folder = combinedItem.item;
-                        return editingFolderId === folder.id ? (
-                          <form
-                            key={`folder-${folder.id}`}
-                            onSubmit={(e) => {
-                              e.preventDefault();
-                              const input = e.currentTarget.querySelector('input');
-                              if (input) {handleFolderRenameSubmit(folder.id, input.value);}
-                            }}
-                            className="mt-4"
-                          >
-                            <input
-                              type="text"
-                              defaultValue={folder.name}
-                              className="w-full bg-background p-1 rounded border border-input"
-                              autoFocus
-                              onBlur={(e) => handleFolderRenameSubmit(folder.id, e.target.value)}
-                            />
-                          </form>
-                        ) : (
-                          <DroppableFolder
-                            key={`folder-${folder.id}`}
-                            id={folder.id}
-                            name={folder.name}
-                            onRename={() => setEditingFolderId(folder.id)}
-                            onDelete={() => onDeleteFolder(folder.id)}
-                            onDrop={(chatId) => onMoveToFolder(chatId, folder.id)}
-                            defaultExpanded={expandedFolders[folder.id]}
-                            hoveredFolder={hoveredFolder}
-                            setHoveredFolder={setHoveredFolder}
-                          >
-                            {renderChatList(folder.id)}
-                          </DroppableFolder>
-                        );
+                        // Format month and year for older items
+                        const monthNames = [
+                          "January", "February", "March", "April", "May", "June",
+                          "July", "August", "September", "October", "November", "December"
+                        ];
+                        return `${monthNames[date.getMonth()]} ${date.getFullYear()}`;
                       }
+                    };
+                    
+                    // Group items by time category
+                    const itemsByCategory: Record<string, typeof combinedItems> = {};
+                    
+                    combinedItems.forEach(item => {
+                      const category = getTimeCategory(item.sortKey);
+                      if (!itemsByCategory[category]) {
+                        itemsByCategory[category] = [];
+                      }
+                      itemsByCategory[category].push(item);
                     });
+                    
+                    // Order of categories to display
+                    const categoryOrder = [
+                      "Today", 
+                      "Yesterday", 
+                      "This Week", 
+                      "Last Week", 
+                      "Previous 30 Days",
+                      // Months will be sorted alphabetically after these
+                    ];
+                    
+                    // Sort the categories
+                    const sortedCategories = Object.keys(itemsByCategory).sort((a, b) => {
+                      const indexA = categoryOrder.indexOf(a);
+                      const indexB = categoryOrder.indexOf(b);
+                      
+                      // If both are in our predefined order
+                      if (indexA !== -1 && indexB !== -1) {
+                        return indexA - indexB;
+                      }
+                      // If only a is in predefined order, it comes first
+                      if (indexA !== -1) return -1;
+                      // If only b is in predefined order, it comes first
+                      if (indexB !== -1) return 1;
+                      // Otherwise sort alphabetically (for month categories)
+                      return a.localeCompare(b);
+                    });
+                    
+                    // Render categories and their items
+                    return (
+                      <>
+                        {sortedCategories.map(category => (
+                          <div key={category} className="mb-4">
+                            <h3 className="text-xs font-semibold text-muted-foreground px-2 py-1">{category}</h3>
+                            {itemsByCategory[category].map(combinedItem => {
+                              if (combinedItem.type === 'chat') {
+                                const chat = combinedItem.item;
+                                return editingChatId === chat.id ? (
+                                  <form
+                                    key={`chat-${chat.id}`}
+                                    onSubmit={(e) => {
+                                      e.preventDefault();
+                                      const input = e.currentTarget.querySelector('input');
+                                      if (input) {handleRenameSubmit(chat.id, input.value);}
+                                    }}
+                                    className="p-2"
+                                  >
+                                    <input
+                                      type="text"
+                                      defaultValue={chat.name}
+                                      maxLength={20}
+                                      className="w-full bg-background p-1 rounded border border-input"
+                                      autoFocus
+                                      onBlur={(e) => handleRenameSubmit(chat.id, e.target.value)}
+                                    />
+                                  </form>
+                                ) : (
+                                  <DraggableChatItem
+                                    key={`chat-${chat.id}`}
+                                    chat={chat}
+                                    isSelected={selectedChat === chat.id}
+                                    onSelect={() => handleChatSelect(chat.id)}
+                                    onRename={() => setEditingChatId(chat.id)}
+                                    onDelete={() => {
+                                      onDeleteChat(chat.id);
+                                      if (selectedChat === chat.id) {
+                                        onNewChat();
+                                      }
+                                    }}
+                                    isLoading={isLoading}
+                                    setHoveredFolder={setHoveredFolder}
+                                    hoveredFolder={hoveredFolder}
+                                    allChats={chats}
+                                  />
+                                );
+                              } else {
+                                // It's a folder
+                                const folder = combinedItem.item;
+                                return editingFolderId === folder.id ? (
+                                  <form
+                                    key={`folder-${folder.id}`}
+                                    onSubmit={(e) => {
+                                      e.preventDefault();
+                                      const input = e.currentTarget.querySelector('input');
+                                      if (input) {handleFolderRenameSubmit(folder.id, input.value);}
+                                    }}
+                                    className="mt-4"
+                                  >
+                                    <input
+                                      type="text"
+                                      defaultValue={folder.name}
+                                      className="w-full bg-background p-1 rounded border border-input"
+                                      autoFocus
+                                      onBlur={(e) => handleFolderRenameSubmit(folder.id, e.target.value)}
+                                    />
+                                  </form>
+                                ) : (
+                                  <DroppableFolder
+                                    key={`folder-${folder.id}`}
+                                    id={folder.id}
+                                    name={folder.name}
+                                    onRename={() => setEditingFolderId(folder.id)}
+                                    onDelete={() => onDeleteFolder(folder.id)}
+                                    onDrop={(chatId) => onMoveToFolder(chatId, folder.id)}
+                                    defaultExpanded={expandedFolders[folder.id]}
+                                    hoveredFolder={hoveredFolder}
+                                    setHoveredFolder={setHoveredFolder}
+                                  >
+                                    {renderChatList(folder.id)}
+                                  </DroppableFolder>
+                                );
+                              }
+                            })}
+                          </div>
+                        ))}
+                      </>
+                    );
                   })()}
                 </div>
               </div>
