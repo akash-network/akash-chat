@@ -494,9 +494,9 @@ export function ChatSidebar({
                         return indexA - indexB;
                       }
                       // If only a is in predefined order, it comes first
-                      if (indexA !== -1) return -1;
+                      if (indexA !== -1) {return -1;}
                       // If only b is in predefined order, it comes first
-                      if (indexB !== -1) return 1;
+                      if (indexB !== -1) {return 1;}
                       // Otherwise sort alphabetically (for month categories)
                       return a.localeCompare(b);
                     });
