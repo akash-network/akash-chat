@@ -367,45 +367,136 @@ export function ChatSidebar({
                   </form>
                 ) : null}
 
-                {/* Folders */}
-                {folders.map(folder => (
-                  editingFolderId === folder.id ? (
-                    <form
-                      key={folder.id}
-                      onSubmit={(e) => {
-                        e.preventDefault();
-                        const input = e.currentTarget.querySelector('input');
-                        if (input) {handleFolderRenameSubmit(folder.id, input.value);}
-                      }}
-                      className="mt-4"
-                    >
-                      <input
-                        type="text"
-                        defaultValue={folder.name}
-                        className="w-full bg-background p-1 rounded border border-input"
-                        autoFocus
-                        onBlur={(e) => handleFolderRenameSubmit(folder.id, e.target.value)}
-                      />
-                    </form>
-                  ) : (
-                    <DroppableFolder
-                      key={folder.id}
-                      id={folder.id}
-                      name={folder.name}
-                      onRename={() => setEditingFolderId(folder.id)}
-                      onDelete={() => onDeleteFolder(folder.id)}
-                      onDrop={(chatId) => onMoveToFolder(chatId, folder.id)}
-                      defaultExpanded={expandedFolders[folder.id]}
-                      hoveredFolder={hoveredFolder}
-                      setHoveredFolder={setHoveredFolder}
-                    >
-                      {renderChatList(folder.id)}
-                    </DroppableFolder>
-                  )
-                ))}
+                {/* Combined folders and chats in a unified list */}
+                <div className="space-y-1">
+                  {/* Create a combined array of folders and ungrouped chats */}
+                  {(() => {
+                    // Helper function to get the timestamp of the most recent message in a chat
+                    const getLatestMessageTimestamp = (chat: ChatHistory): number => {
+                      if (!chat.messages || chat.messages.length === 0) {
+                        return 0; // No messages, use lowest priority
+                      }
+                      // Find the latest message and get its timestamp
+                      const latestMessage = chat.messages[chat.messages.length - 1];
+                      // Use createdAt if available, otherwise fallback to id
+                      return latestMessage.createdAt 
+                        ? new Date(latestMessage.createdAt).getTime()
+                        : 0;
+                    };
 
-                {/* Ungrouped Chats */}
-                {renderChatList(null)}
+                    // Get the latest activity timestamp for a folder (based on its chats)
+                    const getFolderLatestActivity = (folderId: string): number => {
+                      const folderChats = chats.filter(chat => chat.folderId === folderId);
+                      if (folderChats.length === 0) {
+                        return 0; // Empty folder
+                      }
+                      // Get the latest timestamp from any chat in the folder
+                      return Math.max(...folderChats.map(getLatestMessageTimestamp));
+                    };
+
+                    // Get ungrouped chats
+                    const ungroupedChats = chats
+                      .filter(chat => chat.folderId === null)
+                      .map(chat => ({
+                        type: 'chat' as const,
+                        item: chat,
+                        // Sort by latest message timestamp
+                        sortKey: getLatestMessageTimestamp(chat)
+                      }));
+                    
+                    // Get folders
+                    const folderItems = folders.map(folder => ({
+                      type: 'folder' as const,
+                      item: folder,
+                      // Sort by latest activity in any chat within the folder
+                      sortKey: getFolderLatestActivity(folder.id)
+                    }));
+                    
+                    // Combine and sort by the most recent activity timestamp (newest first)
+                    const combinedItems = [...ungroupedChats, ...folderItems]
+                      .sort((a, b) => b.sortKey - a.sortKey);
+                    
+                    return combinedItems.map(combinedItem => {
+                      if (combinedItem.type === 'chat') {
+                        const chat = combinedItem.item;
+                        return editingChatId === chat.id ? (
+                          <form
+                            key={`chat-${chat.id}`}
+                            onSubmit={(e) => {
+                              e.preventDefault();
+                              const input = e.currentTarget.querySelector('input');
+                              if (input) {handleRenameSubmit(chat.id, input.value);}
+                            }}
+                            className="p-2"
+                          >
+                            <input
+                              type="text"
+                              defaultValue={chat.name}
+                              maxLength={20}
+                              className="w-full bg-background p-1 rounded border border-input"
+                              autoFocus
+                              onBlur={(e) => handleRenameSubmit(chat.id, e.target.value)}
+                            />
+                          </form>
+                        ) : (
+                          <DraggableChatItem
+                            key={`chat-${chat.id}`}
+                            chat={chat}
+                            isSelected={selectedChat === chat.id}
+                            onSelect={() => handleChatSelect(chat.id)}
+                            onRename={() => setEditingChatId(chat.id)}
+                            onDelete={() => {
+                              onDeleteChat(chat.id);
+                              if (selectedChat === chat.id) {
+                                onNewChat();
+                              }
+                            }}
+                            isLoading={isLoading}
+                            setHoveredFolder={setHoveredFolder}
+                            hoveredFolder={hoveredFolder}
+                            allChats={chats}
+                          />
+                        );
+                      } else {
+                        // It's a folder
+                        const folder = combinedItem.item;
+                        return editingFolderId === folder.id ? (
+                          <form
+                            key={`folder-${folder.id}`}
+                            onSubmit={(e) => {
+                              e.preventDefault();
+                              const input = e.currentTarget.querySelector('input');
+                              if (input) {handleFolderRenameSubmit(folder.id, input.value);}
+                            }}
+                            className="mt-4"
+                          >
+                            <input
+                              type="text"
+                              defaultValue={folder.name}
+                              className="w-full bg-background p-1 rounded border border-input"
+                              autoFocus
+                              onBlur={(e) => handleFolderRenameSubmit(folder.id, e.target.value)}
+                            />
+                          </form>
+                        ) : (
+                          <DroppableFolder
+                            key={`folder-${folder.id}`}
+                            id={folder.id}
+                            name={folder.name}
+                            onRename={() => setEditingFolderId(folder.id)}
+                            onDelete={() => onDeleteFolder(folder.id)}
+                            onDrop={(chatId) => onMoveToFolder(chatId, folder.id)}
+                            defaultExpanded={expandedFolders[folder.id]}
+                            hoveredFolder={hoveredFolder}
+                            setHoveredFolder={setHoveredFolder}
+                          >
+                            {renderChatList(folder.id)}
+                          </DroppableFolder>
+                        );
+                      }
+                    });
+                  })()}
+                </div>
               </div>
 
               {/* Bottom Actions */}
