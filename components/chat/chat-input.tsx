@@ -93,6 +93,13 @@ export function ChatInput({
     setPreviousInput(input);
   }, [input, previousInput]);
 
+  // Focus textarea on mount
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.focus();
+    }
+  }, []);
+
   return (
     <div className={cn("space-y-4", className)}>
       {(showFileUpload || contextFiles.length > 0) && (
