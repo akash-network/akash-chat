@@ -78,7 +78,7 @@ const ImageGenerationSection = ({ jobId, prompt, negative }: { jobId: string, pr
   useEffect(() => {
     const checkStatus = async () => {
       try {
-        const response = await fetch(`/api/image-status?ids=${jobId}/`);
+        const response = await fetch(`/api/image-status?ids=${jobId}`);
         const data = await response.json();
         
         if (data[0]?.status === 'completed' && data[0]?.result) {
