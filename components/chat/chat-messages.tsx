@@ -25,6 +25,7 @@ interface ChatMessagesProps {
   handleBranch: (index: number) => void;
   sessionInitialized: boolean;
   showStopButton?: boolean;
+  setMessages: (messages: AIMessage[]) => void;
 }
 
 export function ChatMessages({
@@ -41,7 +42,8 @@ export function ChatMessages({
   selectedChat,
   handleBranch,
   sessionInitialized,
-  showStopButton = false
+  showStopButton = false,
+  setMessages
 }: ChatMessagesProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -116,6 +118,8 @@ export function ChatMessages({
                   onRegenerate={message.role === 'assistant' ? async () => {
                     const precedingUserMessage = messages[index - 1];
                     if (precedingUserMessage?.role === 'user') {
+                      const truncatedMessages = messages.slice(0, index);
+                      setMessages(truncatedMessages);
                       reload();
                     }
                   } : undefined}
