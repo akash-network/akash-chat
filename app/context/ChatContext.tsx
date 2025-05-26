@@ -1,7 +1,7 @@
 'use client';
 
 import type { Message as AIMessage } from 'ai';
-import { useChat } from 'ai/react';
+import { useChat } from '@ai-sdk/react'
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useWindowSize } from 'usehooks-ts';
 
@@ -147,6 +147,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     stop,
   } = useChat({
     api: '/api/chat',
+    experimental_throttle: 250,
     body: {
       model: modelSelection,
       system: systemPrompt,
@@ -328,7 +329,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (selectedChat && messages.length > 0) {
       updateChat(selectedChat, messages);
     }
-  }, [messages, selectedChat, updateChat]);
+  }, [messages, selectedChat]);
 
   // Handle access token submission
   const handleAccessTokenSubmit = async () => {
