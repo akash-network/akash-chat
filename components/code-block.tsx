@@ -54,17 +54,30 @@ export function CodeBlock({
                         )}
                     </div>
                     <SyntaxHighlighter
-                        {...props}
-                        style={vscDarkPlus}
-                        language={lang}
-                        PreTag="div"
-                        className="!my-0 !bg-zinc-900 !p-4 border !border-zinc-200 dark:!border-zinc-700 rounded-xl text-sm"
-                        showLineNumbers={true}
-                        wrapLines={true}
-                        wrapLongLines={true}
-                    >
-                        {codeContent}
-                    </SyntaxHighlighter>
+                            {...props}
+                            style={vscDarkPlus}
+                            language={lang}
+                            PreTag="div"
+                            className="!my-0 !bg-zinc-900 !p-4 border !border-zinc-200 dark:!border-zinc-700 rounded-xl text-sm"
+                            showLineNumbers={true}
+                            wrapLines={false}
+                            wrapLongLines={false}
+                            useInlineStyles={true}
+                            customStyle={{
+                                whiteSpace: 'pre',
+                                wordSpacing: 'normal',
+                                wordBreak: 'keep-all'
+                            }}
+                            codeTagProps={{
+                                style: {
+                                    whiteSpace: 'pre',
+                                    wordSpacing: 'normal',
+                                    display: 'block'
+                                }
+                            }}
+                        >
+                            {codeContent}
+                        </SyntaxHighlighter>
                 </div>
             </div>
         );

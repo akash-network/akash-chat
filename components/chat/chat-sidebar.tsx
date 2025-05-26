@@ -146,7 +146,7 @@ export function ChatSidebar({
     }
   };
 
-  const [{}, dropRef] = useDrop<{ id: string; type: string }, void, { isOver: boolean }>(() => ({
+  const [{ }, dropRef] = useDrop<{ id: string; type: string }, void, { isOver: boolean }>(() => ({
     accept: 'CHAT',
     drop: (item, monitor) => {
       if (monitor.isOver({ shallow: true })) {
@@ -162,12 +162,12 @@ export function ChatSidebar({
   dropRef(dropRefElement);
 
   const handleChatSelect = (chatId: string) => {
-    if (isLoading) {return;}
+    if (isLoading) { return; }
     const chat = chats.find(c => c.id === chatId);
     if (chat) {
       setSelectedChat(chatId);
       onSelectChat(chat.messages);
-      
+
       // Check if we're on a model detail page
       const isModelPage = pathname && pathname.startsWith('/models/') && !pathname.endsWith('/chat/');
       const isChatPage = pathname && pathname.endsWith('/chat/');
@@ -178,7 +178,7 @@ export function ChatSidebar({
         // If on chat page and the chat has a model, update the URL to reflect the model
         router.push(`/models/${chat.model.id}/chat/`);
       }
-      
+
       if (isMobile) {
         setSidebarOpen(false);
       }
@@ -187,7 +187,7 @@ export function ChatSidebar({
 
   const handleRenameSubmit = (chatId: string, newName: string) => {
     const trimmedName = newName.trim();
-    if (!trimmedName) {return;}
+    if (!trimmedName) { return; }
 
     // Limit name length to 20 characters
     const limitedName = trimmedName.length > 20
@@ -225,7 +225,7 @@ export function ChatSidebar({
               onSubmit={(e) => {
                 e.preventDefault();
                 const input = e.currentTarget.querySelector('input');
-                if (input) {handleRenameSubmit(chat.id, input.value);}
+                if (input) { handleRenameSubmit(chat.id, input.value); }
               }}
               className="p-2"
             >
@@ -367,45 +367,231 @@ export function ChatSidebar({
                   </form>
                 ) : null}
 
-                {/* Folders */}
-                {folders.map(folder => (
-                  editingFolderId === folder.id ? (
-                    <form
-                      key={folder.id}
-                      onSubmit={(e) => {
-                        e.preventDefault();
-                        const input = e.currentTarget.querySelector('input');
-                        if (input) {handleFolderRenameSubmit(folder.id, input.value);}
-                      }}
-                      className="mt-4"
-                    >
-                      <input
-                        type="text"
-                        defaultValue={folder.name}
-                        className="w-full bg-background p-1 rounded border border-input"
-                        autoFocus
-                        onBlur={(e) => handleFolderRenameSubmit(folder.id, e.target.value)}
-                      />
-                    </form>
-                  ) : (
-                    <DroppableFolder
-                      key={folder.id}
-                      id={folder.id}
-                      name={folder.name}
-                      onRename={() => setEditingFolderId(folder.id)}
-                      onDelete={() => onDeleteFolder(folder.id)}
-                      onDrop={(chatId) => onMoveToFolder(chatId, folder.id)}
-                      defaultExpanded={expandedFolders[folder.id]}
-                      hoveredFolder={hoveredFolder}
-                      setHoveredFolder={setHoveredFolder}
-                    >
-                      {renderChatList(folder.id)}
-                    </DroppableFolder>
-                  )
-                ))}
+                {/* Combined folders and chats in a unified list */}
+                <div className="space-y-1">
+                  {/* Create a combined array of folders and ungrouped chats */}
+                  {(() => {
+                    // Helper function to get the timestamp of the most recent message in a chat
+                    const getLatestMessageTimestamp = (chat: ChatHistory): number => {
+                      if (!chat.messages || chat.messages.length === 0) {
+                        return 0; // No messages, use lowest priority
+                      }
+                      // Find the latest message and get its timestamp
+                      const latestMessage = chat.messages[chat.messages.length - 1];
+                      // Use createdAt if available, otherwise fallback to id
+                      return latestMessage.createdAt
+                        ? new Date(latestMessage.createdAt).getTime()
+                        : 0;
+                    };
 
-                {/* Ungrouped Chats */}
-                {renderChatList(null)}
+                    // Get the latest activity timestamp for a folder (based on its chats)
+                    const getFolderLatestActivity = (folderId: string): number => {
+                      const folderChats = chats.filter(chat => chat.folderId === folderId);
+                      if (folderChats.length === 0) {
+                        return 0; // Empty folder
+                      }
+                      // Get the latest timestamp from any chat in the folder
+                      return Math.max(...folderChats.map(getLatestMessageTimestamp));
+                    };
+
+                    // Get ungrouped chats
+                    const ungroupedChats = chats
+                      .filter(chat => chat.folderId === null)
+                      .map(chat => ({
+                        type: 'chat' as const,
+                        item: chat,
+                        // Sort by latest message timestamp
+                        sortKey: getLatestMessageTimestamp(chat)
+                      }));
+
+                    // Get folders
+                    const folderItems = folders.map(folder => ({
+                      type: 'folder' as const,
+                      item: folder,
+                      // Sort by latest activity in any chat within the folder
+                      sortKey: getFolderLatestActivity(folder.id)
+                    }));
+
+                    // Combine and sort by the most recent activity timestamp (newest first)
+                    const combinedItems = [...ungroupedChats, ...folderItems]
+                      .sort((a, b) => b.sortKey - a.sortKey);
+
+                    // Function to get a readable time category for a timestamp
+                    const getTimeCategory = (timestamp: number): string => {
+                      if (timestamp === 0) { return "No Recent Activity"; }
+
+                      const now = new Date();
+                      const date = new Date(timestamp);
+
+                      // Reset hours to compare just the dates
+                      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                      const yesterday = new Date(today);
+                      yesterday.setDate(yesterday.getDate() - 1);
+
+                      // Calculate start of this week (starting Sunday)
+                      const thisWeekStart = new Date(today);
+                      thisWeekStart.setDate(thisWeekStart.getDate() - thisWeekStart.getDay());
+
+                      // Calculate start of last week
+                      const lastWeekStart = new Date(thisWeekStart);
+                      lastWeekStart.setDate(lastWeekStart.getDate() - 7);
+
+                      // Calculate 30 days ago
+                      const thirtyDaysAgo = new Date(today);
+                      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+                      // Simple date comparison
+                      const itemDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+
+                      if (itemDate.getTime() === today.getTime()) {
+                        return "Today";
+                      } else if (itemDate.getTime() === yesterday.getTime()) {
+                        return "Yesterday";
+                      } else if (itemDate >= thisWeekStart) {
+                        return "This Week";
+                      } else if (itemDate >= lastWeekStart) {
+                        return "Last Week";
+                      } else if (itemDate >= thirtyDaysAgo) {
+                        return "Previous 30 Days";
+                      } else {
+                        // Format month and year for older items
+                        const monthNames = [
+                          "January", "February", "March", "April", "May", "June",
+                          "July", "August", "September", "October", "November", "December"
+                        ];
+                        return `${monthNames[date.getMonth()]} ${date.getFullYear()}`;
+                      }
+                    };
+
+                    // Group items by time category
+                    const itemsByCategory: Record<string, typeof combinedItems> = {};
+
+                    combinedItems.forEach(item => {
+                      const category = getTimeCategory(item.sortKey);
+                      if (!itemsByCategory[category]) {
+                        itemsByCategory[category] = [];
+                      }
+                      itemsByCategory[category].push(item);
+                    });
+
+                    // Order of categories to display
+                    const categoryOrder = [
+                      "Today",
+                      "Yesterday",
+                      "This Week",
+                      "Last Week",
+                      "Previous 30 Days",
+                      // Months will be sorted alphabetically after these
+                    ];
+
+                    // Sort the categories
+                    const sortedCategories = Object.keys(itemsByCategory).sort((a, b) => {
+                      const indexA = categoryOrder.indexOf(a);
+                      const indexB = categoryOrder.indexOf(b);
+
+                      // If both are in our predefined order
+                      if (indexA !== -1 && indexB !== -1) {
+                        return indexA - indexB;
+                      }
+                      // If only a is in predefined order, it comes first
+                      if (indexA !== -1) {return -1;}
+                      // If only b is in predefined order, it comes first
+                      if (indexB !== -1) {return 1;}
+                      // Otherwise sort alphabetically (for month categories)
+                      return a.localeCompare(b);
+                    });
+
+                    // Render categories and their items
+                    return (
+                      <>
+                        {sortedCategories.map(category => (
+                          <div key={category} className="mb-4">
+                            <h3 className="text-xs font-semibold text-muted-foreground px-2 py-1">{category}</h3>
+                            {itemsByCategory[category].map(combinedItem => {
+                              if (combinedItem.type === 'chat') {
+                                const chat = combinedItem.item;
+                                return editingChatId === chat.id ? (
+                                  <form
+                                    key={`chat-${chat.id}`}
+                                    onSubmit={(e) => {
+                                      e.preventDefault();
+                                      const input = e.currentTarget.querySelector('input');
+                                      if (input) { handleRenameSubmit(chat.id, input.value); }
+                                    }}
+                                    className="p-2"
+                                  >
+                                    <input
+                                      type="text"
+                                      defaultValue={chat.name}
+                                      maxLength={20}
+                                      className="w-full bg-background p-1 rounded border border-input"
+                                      autoFocus
+                                      onBlur={(e) => handleRenameSubmit(chat.id, e.target.value)}
+                                    />
+                                  </form>
+                                ) : (
+                                  <DraggableChatItem
+                                    key={`chat-${chat.id}`}
+                                    chat={chat}
+                                    isSelected={selectedChat === chat.id}
+                                    onSelect={() => handleChatSelect(chat.id)}
+                                    onRename={() => setEditingChatId(chat.id)}
+                                    onDelete={() => {
+                                      onDeleteChat(chat.id);
+                                      if (selectedChat === chat.id) {
+                                        onNewChat();
+                                      }
+                                    }}
+                                    isLoading={isLoading}
+                                    setHoveredFolder={setHoveredFolder}
+                                    hoveredFolder={hoveredFolder}
+                                    allChats={chats}
+                                  />
+                                );
+                              } else {
+                                // It's a folder
+                                const folder = combinedItem.item;
+                                return editingFolderId === folder.id ? (
+                                  <form
+                                    key={`folder-${folder.id}`}
+                                    onSubmit={(e) => {
+                                      e.preventDefault();
+                                      const input = e.currentTarget.querySelector('input');
+                                      if (input) { handleFolderRenameSubmit(folder.id, input.value); }
+                                    }}
+                                    className="mt-4"
+                                  >
+                                    <input
+                                      type="text"
+                                      defaultValue={folder.name}
+                                      className="w-full bg-background p-1 rounded border border-input"
+                                      autoFocus
+                                      onBlur={(e) => handleFolderRenameSubmit(folder.id, e.target.value)}
+                                    />
+                                  </form>
+                                ) : (
+                                  <DroppableFolder
+                                    key={`folder-${folder.id}`}
+                                    id={folder.id}
+                                    name={folder.name}
+                                    onRename={() => setEditingFolderId(folder.id)}
+                                    onDelete={() => onDeleteFolder(folder.id)}
+                                    onDrop={(chatId) => onMoveToFolder(chatId, folder.id)}
+                                    defaultExpanded={expandedFolders[folder.id]}
+                                    hoveredFolder={hoveredFolder}
+                                    setHoveredFolder={setHoveredFolder}
+                                  >
+                                    {renderChatList(folder.id)}
+                                  </DroppableFolder>
+                                );
+                              }
+                            })}
+                          </div>
+                        ))}
+                      </>
+                    );
+                  })()}
+                </div>
               </div>
 
               {/* Bottom Actions */}
