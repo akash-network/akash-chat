@@ -1,7 +1,7 @@
 'use client';
 
-import type { Message as AIMessage } from 'ai';
 import { useChat } from '@ai-sdk/react'
+import type { Message as AIMessage } from 'ai';
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useWindowSize } from 'usehooks-ts';
 
