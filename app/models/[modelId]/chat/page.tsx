@@ -30,6 +30,7 @@ export default function ModelDetailPage( {params}: any) {
     
     // Chat state
     messages,
+    setMessages,
     input,
     handleInputChange,
     handleSubmit,
@@ -198,6 +199,7 @@ export default function ModelDetailPage( {params}: any) {
       
       <ChatMessages
         messages={messages}
+        setMessages={setMessages}
         input={input}
         isLoading={isLoading}
         contextFiles={contextFiles}

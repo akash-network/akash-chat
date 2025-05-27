@@ -60,7 +60,8 @@ export function ChatHome() {
     systemPrompt,
     setSystemPrompt,
     setTemperature,
-    setTopP
+    setTopP,
+    setMessages
   } = useChatContext();
 
   return (
@@ -110,6 +111,7 @@ export function ChatHome() {
         handleBranch={handleBranch}
         sessionInitialized={sessionInitialized}
         showStopButton
+        setMessages={setMessages}
       />
 
       <ModelConfig
