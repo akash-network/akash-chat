@@ -147,7 +147,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     stop,
   } = useChat({
     api: '/api/chat',
-    experimental_throttle: 250,
+    experimental_throttle: 150,
     body: {
       model: modelSelection,
       system: systemPrompt,
