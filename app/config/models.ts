@@ -18,6 +18,28 @@ export interface Model {
 
 export const models: Model[] = [
   {
+    id: 'DeepSeek-R1-0528',
+    name: 'DeepSeek R1 0528',
+    description: 'Strong Mixture-of-Experts (MoE) LLM',
+    available: true,
+    temperature: 0.6,
+    top_p: 0.95,
+    tokenLimit: 64000,
+    parameters: '671B',
+    architecture: 'Mixture-of-Experts',
+    hf_repo: 'deepseek-ai/DeepSeek-R1-0528',
+    aboutContent: `Experience **DeepSeek R1 0528**, the latest iteration of DeepSeek's groundbreaking reasoning model. This advanced 671B parameter Mixture-of-Experts (MoE) architecture represents a significant leap forward in AI reasoning capabilities, featuring enhanced chain-of-thought processing and superior problem-solving abilities.
+
+The 0528 version introduces refined training techniques and improved reasoning pathways, making it exceptionally powerful for complex analytical tasks, mathematical reasoning, and multi-step problem solving. Built for professionals who demand the highest level of AI performance.`,
+    infoContent: `
+* ⚡ Latest DeepSeek R1 0528 with enhanced reasoning capabilities
+* 🧠 Advanced chain-of-thought processing with 671B parameters
+* 🌐 Decentralized hosting for cost-effective, unrestricted access
+* 🔍 Optimized for complex reasoning, analysis, and problem-solving tasks`,
+    thumbnailId: 'deepseek',
+    deployUrl: 'https://console.akash.network/templates/akash-network-awesome-akash-DeepSeek-R1-0528'
+  },
+  {
     id: 'Qwen3-235B-A22B-FP8',
     name: 'Qwen3 235B A22B',
     description: 'Advanced reasoning model with 235B parameters (22B active)',
@@ -134,10 +156,10 @@ Enjoy top-tier performance and low-latency interaction without needing to config
     available: true,
     temperature: 0.6,
     top_p: 0.95,
-    tokenLimit: 128000,
+    tokenLimit: 64000,
     parameters: '671B',
     architecture: 'Mixture-of-Experts',
-    hf_repo: 'DeepSeek/DeepSeek-R1',
+    hf_repo: 'deepseek-ai/DeepSeek-R1',
     aboutContent: `Tap into the strength of **DeepSeek R1 671B**, one of the most capable Mixture-of-Experts (MoE) models available. Now live on AkashChat, this massive model offers world-class performance on tasks like reasoning, planning, and instruction-following.
 
 Built to scale, DeepSeek R1 uses expert routing to reduce compute while maximizing results—ideal for large-scale AI development.`,
