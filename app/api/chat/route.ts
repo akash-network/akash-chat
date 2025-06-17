@@ -1,15 +1,13 @@
 import { createOpenAI } from '@ai-sdk/openai';
 import { streamText, createDataStreamResponse, generateText, simulateReadableStream, Message } from 'ai';
+import cl100k_base from "tiktoken/encoders/cl100k_base.json";
+import { Tiktoken } from "tiktoken/lite";
 
 import { apiEndpoint, apiKey, imgGenFnModel, DEFAULT_SYSTEM_PROMPT } from '@/app/config/api';
 import { defaultModel, models } from '@/app/config/models';
 import { withAuth } from '@/lib/auth';
 import { getAvailableModels } from '@/lib/models';
 import { generateImageTool } from '@/lib/tools';
-
-const cl100k_base = require("tiktoken/encoders/cl100k_base.json");
-const { Tiktoken } = require("tiktoken/lite");
-
 // Allow streaming responses up to 30 seconds
 export const maxDuration = 30;
 
@@ -49,7 +47,9 @@ async function handlePostRequest(req: Request) {
     for (const file of context) {
       const tokens = encoding.encode(file.content);
       if (tokenCount + tokens.length + 1000 > (selectedModel?.tokenLimit || 128000)) {
-        console.log(`Token limit reached: ${tokenCount + tokens.length}`);
+        if (process.env.NODE_ENV === 'development') {
+          console.log(`Token limit reached: ${tokenCount + tokens.length}`);
+        }
         return new Response('Your files have too much content for this model. Please remove some files or try a different model.', {
           status: 400,
           headers: {
@@ -66,7 +66,9 @@ async function handlePostRequest(req: Request) {
     const tokens = encoding.encode(message.content);
 
     if (tokenCount + tokens.length + 1000 > (selectedModel?.tokenLimit || 128000)) {
-      console.log(`Token limit reached: ${tokenCount + tokens.length}`);
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`Token limit reached: ${tokenCount + tokens.length}`);
+      }
       break;
     }
     tokenCount += tokens.length;

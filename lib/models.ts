@@ -1,11 +1,11 @@
 import OpenAI from 'openai';
 
-import { apiEndpoint, apiKey, CACHE_TTL } from '@/app/config/api';
+import { apiEndpoint, apiKey } from '@/app/config/api';
 import { models, Model } from '@/app/config/models';
 import redis from '@/lib/redis';
 
 const MODELS_CACHE_KEY = 'cached_models';
-const MODELS_CACHE_TTL = Math.floor(CACHE_TTL * 0.10); // Cache for 10% of session TTL
+const MODELS_CACHE_TTL = 600; // Cache for 10 minutes
 
 export async function getAvailableModels(): Promise<Model[]> {
     try {

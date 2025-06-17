@@ -1,23 +1,25 @@
 import { Message as AIMessage } from 'ai';
-import { AnimatePresence, motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Copy, ChevronDown, LoaderCircle, Download, GitBranch, Check } from 'lucide-react';
 import { memo, useState, useEffect } from 'react';
 
 import { cn } from '@/lib/utils';
 import { parseMessageContent } from '@/utils/message-parser';
 
+import AnimatedMarkdown from './animated-markdown';
 import { AkashSignLogo } from './branding/akash-sign-logo';
 import { Markdown } from './markdown';
 
 interface MessageProps {
   message: AIMessage;
   isLoading: boolean;
+  status?: 'submitted' | 'streaming' | 'ready' | 'error';
   onRegenerate?: () => void;
   onBranch?: () => void;
   messageIndex?: number;
 }
 
-const ThoughtsSection = ({ content, isLoading }: { content: string, isLoading: boolean }) => {
+const ThoughtsSection = ({ content, isLoading, status }: { content: string, isLoading: boolean, status?: 'submitted' | 'streaming' | 'ready' | 'error' }) => {
   const [isManuallyCollapsed, setIsManuallyCollapsed] = useState(!isLoading);
   const [previousContent, setPreviousContent] = useState(content);
   const isExpanded = !isManuallyCollapsed;
@@ -50,21 +52,25 @@ const ThoughtsSection = ({ content, isLoading }: { content: string, isLoading: b
             )}
           </div>
         </button>
-        <AnimatePresence>
-          {isExpanded && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="overflow-hidden"
-            >
-              <div className="p-3 text-sm text-muted-foreground bg-muted/50 border-x border-b border-border rounded-b-lg">
-                <Markdown>{content}</Markdown>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        
+        {/* Always keep the AnimatedMarkdown mounted, but hide container when collapsed */}
+        <motion.div
+          initial={false}
+          animate={{ 
+            height: isExpanded ? "auto" : 0, 
+            opacity: isExpanded ? 1 : 0 
+          }}
+          transition={{ duration: 0.2 }}
+          className="overflow-hidden"
+        >
+          <div className="p-3 text-sm text-muted-foreground bg-muted/50 border-x border-b border-border rounded-b-lg">
+            {isLoading ? (
+              <AnimatedMarkdown isLoading={isLoading} status={status} sectionIndex={0}>{content}</AnimatedMarkdown>
+            ) : (
+              <Markdown>{content}</Markdown>
+            )}
+          </div>
+        </motion.div>
       </div>
     </div>
   );
@@ -168,7 +174,7 @@ const ImageGenerationSection = ({ jobId, prompt, negative }: { jobId: string, pr
   );
 };
 
-const PureMessage = ({ message, isLoading, onRegenerate, onBranch }: MessageProps) => {
+const PureMessage = ({ message, isLoading, status, onRegenerate, onBranch }: MessageProps) => {
   const sections = message.content ? parseMessageContent(message.content as string) : [];
   const [copied, setCopied] = useState(false);
   const [regenerated, setRegenerated] = useState(false);
@@ -229,7 +235,7 @@ const PureMessage = ({ message, isLoading, onRegenerate, onBranch }: MessageProp
                 {sections.map((section, index) => (
                   <div key={index}>
                     {section.type === 'thoughts' ? (
-                      <ThoughtsSection content={section.content} isLoading={isLoading} />
+                      <ThoughtsSection content={section.content} isLoading={isLoading} status={status} />
                     ) : section.type === 'image_generation' && section.jobId ? (
                       <ImageGenerationSection 
                         jobId={section.jobId} 
@@ -237,7 +243,11 @@ const PureMessage = ({ message, isLoading, onRegenerate, onBranch }: MessageProp
                         negative={section.negative || ''} 
                       />
                     ) : (
-                      <Markdown>{section.content}</Markdown>
+                      message.role === 'assistant' && isLoading ? (
+                        <AnimatedMarkdown isLoading={isLoading} status={status} sectionIndex={index}>{section.content}</AnimatedMarkdown>
+                      ) : (
+                        <Markdown>{section.content}</Markdown>
+                      )
                     )}
                   </div>
                 ))}

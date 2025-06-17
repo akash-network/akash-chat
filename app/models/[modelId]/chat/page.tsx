@@ -35,6 +35,7 @@ export default function ModelDetailPage( {params}: any) {
     handleInputChange,
     handleSubmit,
     isLoading,
+    status,
     contextFiles,
     setContextFiles,
     reload,
@@ -202,6 +203,7 @@ export default function ModelDetailPage( {params}: any) {
         setMessages={setMessages}
         input={input}
         isLoading={isLoading}
+        status={status}
         contextFiles={contextFiles}
         setContextFiles={setContextFiles}
         handleInputChange={handleInputChange}
