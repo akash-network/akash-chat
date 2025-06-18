@@ -1,7 +1,10 @@
 import './globals.css';
+
 import { GoogleAnalytics } from '@next/third-parties/google';
 import { Inter } from 'next/font/google';
 import { ThemeProvider } from 'next-themes';
+
+import { ThemeScript } from '@/components/theme-script';
 
 import { ChatProvider } from './context/ChatContext';
 
@@ -91,9 +94,19 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head />
+      <head>
+        <meta name="color-scheme" content="light dark" />
+        <ThemeScript />
+      </head>
       <body className={inter.className}>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <ThemeProvider 
+          attribute="class" 
+          defaultTheme="system" 
+          enableSystem={true}
+          disableTransitionOnChange={false}
+          storageKey="theme"
+          enableColorScheme={true}
+        >
           <ChatProvider>
             {/* App-wide structured data */}
             <div 

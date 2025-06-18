@@ -2,7 +2,7 @@
 
 import { Message } from 'ai';
 import { AnimatePresence, motion } from 'framer-motion';
-import { FolderPlus, CirclePlus, PanelRightOpen, Heart, CircleHelp, Ellipsis, PlugZap, Globe, ChartBarBig, ChartColumnIncreasing, Settings, Package } from 'lucide-react';
+import { FolderPlus, CirclePlus, PanelRightOpen, Heart, Ellipsis, PlugZap, Globe, ChartBarBig, ChartColumnIncreasing, Settings, Package } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { useState, useEffect, useRef } from 'react';
@@ -77,7 +77,6 @@ export function ChatSidebar({
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [expandedFolders, setExpandedFolders] = useState<Record<string, boolean>>({});
   const [hoveredFolder, setHoveredFolder] = useState<string | null>(null);
-  const [isResourcesOpen, setIsResourcesOpen] = useState(false);
   const [isFollowOpen, setIsFollowOpen] = useState(false);
   const [isMoreInfoOpen, setIsMoreInfoOpen] = useState(false);
   const [importExportMenuOpen, setImportExportMenuOpen] = useState(false);
@@ -103,44 +102,33 @@ export function ChatSidebar({
 
   const closeAllMenus = () => {
     setImportExportMenuOpen(false);
-    setIsResourcesOpen(false);
     setIsFollowOpen(false);
     setIsMoreInfoOpen(false);
   };
 
-  const handleMenuInteraction = (menu: 'importExport' | 'resources' | 'follow' | 'moreInfo', isHovering: boolean = false) => {
+  const handleMenuInteraction = (menu: 'importExport' | 'follow' | 'moreInfo', isHovering: boolean = false) => {
     if (isMobile) {
       // On mobile, toggle the menu on click
       switch (menu) {
         case 'importExport':
           setImportExportMenuOpen(!importExportMenuOpen);
-          setIsResourcesOpen(false);
-          setIsFollowOpen(false);
-          setIsMoreInfoOpen(false);
-          break;
-        case 'resources':
-          setIsResourcesOpen(!isResourcesOpen);
-          setImportExportMenuOpen(false);
           setIsFollowOpen(false);
           setIsMoreInfoOpen(false);
           break;
         case 'follow':
           setIsFollowOpen(!isFollowOpen);
           setImportExportMenuOpen(false);
-          setIsResourcesOpen(false);
           setIsMoreInfoOpen(false);
           break;
         case 'moreInfo':
           setIsMoreInfoOpen(!isMoreInfoOpen);
           setImportExportMenuOpen(false);
-          setIsResourcesOpen(false);
           setIsFollowOpen(false);
           break;
       }
     } else {
       // On desktop, use hover behavior
       setImportExportMenuOpen(menu === 'importExport' && isHovering);
-      setIsResourcesOpen(menu === 'resources' && isHovering);
       setIsFollowOpen(menu === 'follow' && isHovering);
       setIsMoreInfoOpen(menu === 'moreInfo' && isHovering);
     }
@@ -759,81 +747,6 @@ export function ChatSidebar({
                   )}
                 </div>
 
-                <div className="relative">
-                  <Button
-                    variant="ghost"
-                    className="w-full justify-start gap-2 h-8 px-2 text-sm font-light hover:bg-white dark:hover:bg-accent hover:text-accent-foreground"
-                    onClick={() => isMobile && handleMenuInteraction('resources')}
-                    onMouseEnter={() => !isMobile && handleMenuInteraction('resources', true)}
-                    onMouseLeave={() => !isMobile && handleMenuInteraction('resources', false)}
-                  >
-                    <CircleHelp className="w-3.5 h-3.5" />
-                    <span>Resources</span>
-                  </Button>
-
-                  {isResourcesOpen && (
-                    <div
-                      className={cn(
-                        "absolute pl-1 z-50",
-                        isMobile
-                          ? "right-0 bottom-full pl-0 w-full mb-1"
-                          : "left-full bottom-0"
-                      )}
-                      onMouseEnter={() => !isMobile && handleMenuInteraction('resources', true)}
-                      onMouseLeave={() => !isMobile && handleMenuInteraction('resources', false)}
-                    >
-                      <div className={cn(
-                        "bg-popover border rounded-md p-1 min-w-[160px] shadow-md backdrop-blur-sm",
-                        isMobile && "w-full bg-popover/100 max-h-[40vh] overflow-y-auto"
-                      )}>
-                        <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">Website</div>
-                        <Link href="https://akash.network" target="_blank" rel="noopener noreferrer">
-                          <Button
-                            variant="ghost"
-                            className="w-full justify-start gap-2 h-8 px-2 text-sm font-light hover:bg-accent hover:text-accent-foreground"
-                            onClick={() => setIsResourcesOpen(false)}
-                          >
-                            <Globe className="w-3.5 h-3.5" />
-                            <span>akash.network</span>
-                          </Button>
-                        </Link>
-                        <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground mt-1">Resources</div>
-                        <Link href="https://stats.akash.network" target="_blank" rel="noopener noreferrer">
-                          <Button
-                            variant="ghost"
-                            className="w-full justify-start gap-2 h-8 px-2 text-sm font-light hover:bg-accent hover:text-accent-foreground"
-                            onClick={() => setIsResourcesOpen(false)}
-                          >
-                            <ChartColumnIncreasing className="w-3.5 h-3.5" />
-                            <span>Akash Stats</span>
-                          </Button>
-                        </Link>
-                        <Link href="https://akash.network/pricing/gpus" target="_blank" rel="noopener noreferrer">
-                          <Button
-                            variant="ghost"
-                            className="w-full justify-start gap-2 h-8 px-2 text-sm font-light hover:bg-accent hover:text-accent-foreground"
-                            onClick={() => setIsResourcesOpen(false)}
-                          >
-                            <ChartBarBig className="w-3.5 h-3.5" />
-                            <span>Price Compare</span>
-                          </Button>
-                        </Link>
-                        <Link href="https://docs.akash.network" target="_blank" rel="noopener noreferrer">
-                          <Button
-                            variant="ghost"
-                            className="w-full justify-start gap-2 h-8 px-2 text-sm font-light hover:bg-accent hover:text-accent-foreground"
-                            onClick={() => setIsResourcesOpen(false)}
-                          >
-                            <svg viewBox="0 0 24 24" className="w-3.5 h-3.5">
-                              <path fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20" />
-                            </svg>
-                            <span>Akash Docs</span>
-                          </Button>
-                        </Link>
-                      </div>
-                    </div>
-                  )}
-                </div>
                 <Link href="/models">
                   <Button
                     variant="ghost"
@@ -881,12 +794,60 @@ export function ChatSidebar({
                         "bg-popover border rounded-md p-1 min-w-[160px] shadow-md backdrop-blur-sm",
                         isMobile && "w-full bg-popover/100 max-h-[40vh] overflow-y-auto"
                       )}>
+                        <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">Website</div>
+                        <Link href="https://akash.network" target="_blank" rel="noopener noreferrer">
+                          <Button
+                            variant="ghost"
+                            className="w-full justify-start gap-2 h-8 px-2 text-sm font-light hover:bg-accent hover:text-accent-foreground"
+                            onClick={() => setIsMoreInfoOpen(false)}
+                          >
+                            <Globe className="w-3.5 h-3.5" />
+                            <span>akash.network</span>
+                          </Button>
+                        </Link>
+                        <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground mt-1">Resources</div>
+                        <Link href="https://stats.akash.network" target="_blank" rel="noopener noreferrer">
+                          <Button
+                            variant="ghost"
+                            className="w-full justify-start gap-2 h-8 px-2 text-sm font-light hover:bg-accent hover:text-accent-foreground"
+                            onClick={() => setIsMoreInfoOpen(false)}
+                          >
+                            <ChartColumnIncreasing className="w-3.5 h-3.5" />
+                            <span>Akash Stats</span>
+                          </Button>
+                        </Link>
+                        <Link href="https://akash.network/pricing/gpus" target="_blank" rel="noopener noreferrer">
+                          <Button
+                            variant="ghost"
+                            className="w-full justify-start gap-2 h-8 px-2 text-sm font-light hover:bg-accent hover:text-accent-foreground"
+                            onClick={() => setIsMoreInfoOpen(false)}
+                          >
+                            <ChartBarBig className="w-3.5 h-3.5" />
+                            <span>Price Compare</span>
+                          </Button>
+                        </Link>
+                        <Link href="https://docs.akash.network" target="_blank" rel="noopener noreferrer">
+                          <Button
+                            variant="ghost"
+                            className="w-full justify-start gap-2 h-8 px-2 text-sm font-light hover:bg-accent hover:text-accent-foreground"
+                            onClick={() => setIsMoreInfoOpen(false)}
+                          >
+                            <svg viewBox="0 0 24 24" className="w-3.5 h-3.5">
+                              <path fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20" />
+                            </svg>
+                            <span>Akash Docs</span>
+                          </Button>
+                        </Link>
+                        <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground mt-1">Legal</div>
                         <Link href="/terms" target="_blank" rel="noopener noreferrer">
                           <Button
                             variant="ghost"
                             className="w-full justify-start gap-2 h-8 px-2 text-sm font-light hover:bg-accent hover:text-accent-foreground"
                             onClick={() => setIsMoreInfoOpen(false)}
                           >
+                            <svg viewBox="0 0 24 24" className="w-3.5 h-3.5">
+                              <path fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                            </svg>
                             <span>Terms of Service</span>
                           </Button>
                         </Link>
@@ -896,6 +857,9 @@ export function ChatSidebar({
                             className="w-full justify-start gap-2 h-8 px-2 text-sm font-light hover:bg-accent hover:text-accent-foreground"
                             onClick={() => setIsMoreInfoOpen(false)}
                           >
+                            <svg viewBox="0 0 24 24" className="w-3.5 h-3.5">
+                              <path fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                            </svg>
                             <span>Privacy Policy</span>
                           </Button>
                         </Link>
