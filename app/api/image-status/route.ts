@@ -1,9 +1,5 @@
 import { imgApiKey, imgEndpoint } from '@/app/config/api';
 
-// Disable caching for this API route
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
-
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
@@ -46,23 +42,11 @@ export async function GET(req: Request) {
       });
       return new Response(JSON.stringify(updatedData), {
         status: 200,
-        headers: {
-          'Content-Type': 'application/json',
-          'Cache-Control': 'no-cache, no-store, max-age=0, must-revalidate',
-          'Pragma': 'no-cache',
-          'Expires': '0'
-        }
       });
     }
     
     return new Response(JSON.stringify(data), {
       status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Cache-Control': 'no-cache, no-store, max-age=0, must-revalidate',
-        'Pragma': 'no-cache',
-        'Expires': '0'
-      }
     });
   } catch (error) {
     console.error('Error checking image status:', error);
