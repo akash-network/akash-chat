@@ -87,17 +87,16 @@ const ImageGenerationSection = ({ jobId, prompt, negative }: { jobId: string, pr
         const response = await fetch(`/api/image-status?ids=${jobId}`);
         const data = await response.json();
         
-        if (data[0]?.status === 'completed' && data[0]?.result) {
-          const imageResponse = await fetch(data[0].result);
-          const blob = await imageResponse.blob();
-          const url = URL.createObjectURL(blob);
-          setImageUrl(url);
+        if (data[0]?.status === 'succeeded' && data[0]?.result) {
+          setImageUrl(data[0].result);
           setIsLoading(false);
           clearInterval(interval);
         } else if (data[0]?.status === 'failed') {
           setError('Image generation failed');
           setIsLoading(false);
           clearInterval(interval); 
+        } else if (data[0]?.status === 'waiting' || data[0]?.status === 'pending') {
+          // Job is still processing, continue polling
         } else {
           if (typeof data === 'string' && data.startsWith('Job not found:')) {
             setError('Image not found');
