@@ -80,6 +80,7 @@ const ImageGenerationSection = ({ jobId, prompt, negative }: { jobId: string, pr
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [errorCount, setErrorCount] = useState(0);
 
   useEffect(() => {
