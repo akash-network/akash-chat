@@ -37,7 +37,7 @@ export function ModelConfig({
   const [promptName, setPromptName] = useState('');
   const [showSaveInput, setShowSaveInput] = useState(false);
   const [selectedPromptName, setSelectedPromptName] = useState<string | null>(null);
-  const maxLength = 800;
+  const maxLength = 1500;
 
   // Get current model configuration
   const currentModelConfig = models.find(m => m.id === currentModel);
