@@ -80,24 +80,42 @@ const ImageGenerationSection = ({ jobId, prompt, negative }: { jobId: string, pr
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [errorCount, setErrorCount] = useState(0);
 
   useEffect(() => {
     const checkStatus = async () => {
       try {
         const response = await fetch(`/api/image-status?ids=${jobId}`);
+        
+        if (response.status === 404) {
+          setErrorCount(prev => {
+            const newCount = prev + 1;
+            if (newCount >= 3) {
+              setError('Image not found after multiple attempts');
+              setIsLoading(false);
+              clearInterval(interval);
+            }
+            return newCount;
+          });
+          return;
+        }
+        
+        // Reset error count on successful response
+        setErrorCount(0);
+        
         const data = await response.json();
         
-        if (data[0]?.status === 'completed' && data[0]?.result) {
-          const imageResponse = await fetch(data[0].result);
-          const blob = await imageResponse.blob();
-          const url = URL.createObjectURL(blob);
-          setImageUrl(url);
+        if (data[0]?.status === 'succeeded' && data[0]?.result) {
+          setImageUrl(data[0].result);
           setIsLoading(false);
           clearInterval(interval);
         } else if (data[0]?.status === 'failed') {
           setError('Image generation failed');
           setIsLoading(false);
           clearInterval(interval); 
+        } else if (data[0]?.status === 'waiting' || data[0]?.status === 'pending') {
+          // Job is still processing, continue polling
         } else {
           if (typeof data === 'string' && data.startsWith('Job not found:')) {
             setError('Image not found');
