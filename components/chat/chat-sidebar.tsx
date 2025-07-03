@@ -764,7 +764,7 @@ export function ChatSidebar({
                   onClick={onConfigureModel}
                 >
                   <Settings className="w-3.5 h-3.5" />
-                  <span>Configure Model</span>
+                  <span>Configure</span>
                 </Button>
 
                 <div className="relative">

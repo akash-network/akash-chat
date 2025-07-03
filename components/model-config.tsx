@@ -1,8 +1,10 @@
 'use client';
 
-import { Plus, Save, Trash2, RotateCcw } from "lucide-react";
+import { Plus, Save, Trash2, RotateCcw, Sun, Moon, Monitor } from "lucide-react";
+import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 
+import { DEFAULT_SYSTEM_PROMPT } from "@/app/config/api";
 import { models } from "@/app/config/models";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
@@ -22,6 +24,73 @@ interface ModelConfigProps {
 interface SavedPrompt {
   name: string;
   content: string;
+}
+
+function ThemeToggle() {
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return null;
+  }
+
+  const themes = [
+    { value: 'light', label: 'Light', icon: Sun },
+    { value: 'dark', label: 'Dark', icon: Moon },
+    { value: 'system', label: 'System', icon: Monitor },
+  ];
+
+  const currentThemeIndex = themes.findIndex(t => t.value === theme);
+  const currentTheme = themes[currentThemeIndex] || themes[0];
+
+  const handleThemeSelect = (themeValue: string) => {
+    setTheme(themeValue);
+  };
+
+  return (
+    <div className="space-y-2">
+      <label className="text-sm font-medium">Theme</label>
+      
+      <div className="flex items-center gap-3">
+        {/* Interactive toggle switch */}
+        <div className="relative flex bg-muted border border-border rounded-lg p-1 flex-shrink-0">
+          {/* Background slider */}
+          <div 
+            className="absolute top-1 bottom-1 w-8 bg-background border border-border rounded-md shadow-sm transition-all duration-300 ease-out"
+            style={{ 
+              left: `${4 + currentThemeIndex * 32}px`
+            }}
+          />
+          
+          {/* Interactive theme buttons */}
+          {themes.map((themeOption, index) => (
+            <button
+              key={themeOption.value}
+              onClick={() => handleThemeSelect(themeOption.value)}
+              className={`relative z-10 flex items-center justify-center w-8 h-6 transition-all duration-200 rounded-md ${
+                currentThemeIndex === index 
+                  ? 'text-foreground' 
+                  : 'text-muted-foreground hover:text-foreground/80'
+              }`}
+              title={themeOption.label}
+            >
+              <themeOption.icon className="w-3.5 h-3.5" />
+            </button>
+          ))}
+        </div>
+        
+        {/* Current theme label */}
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <currentTheme.icon className="w-4 h-4" />
+          <span>{currentTheme.label}</span>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export function ModelConfig({ 
@@ -110,17 +179,34 @@ export function ModelConfig({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px] max-h-[90vh] overflow-y-auto p-2 sm:p-6 w-[97vw] sm:w-full mx-auto rounded-lg">
         <DialogHeader>
-          <DialogTitle>Model Configuration</DialogTitle>
+          <DialogTitle>Configurations</DialogTitle>
           <DialogDescription>
-            Adjust the model parameters to customize its behavior.
+            Adjust the model parameters and theme.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4 py-2 sm:py-4">
+        <div className="space-y-4">
+          {/* Theme Toggle */}
+          <ThemeToggle />
           {/* System Prompt */}
           <div className="space-y-2">
             <div className="flex justify-between">
-              <label className="text-sm font-medium">System Prompt</label>
+              <div className="flex items-center gap-2">
+                <label className="text-sm font-medium">System Prompt</label>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="h-6 px-2"
+                  onClick={() => {
+                    onSystemPromptChange(DEFAULT_SYSTEM_PROMPT);
+                    setSelectedPromptName(null);
+                    setPromptName('');
+                  }}
+                  title="Reset to default system prompt"
+                >
+                  <RotateCcw className="w-3 h-3" />
+                </Button>
+              </div>
               <span className="text-xs text-muted-foreground">
                 {systemPrompt.length}/{maxLength}
               </span>
