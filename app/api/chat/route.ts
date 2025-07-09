@@ -69,6 +69,31 @@ async function handlePostRequest(req: Request) {
       if (process.env.NODE_ENV === 'development') {
         console.log(`Token limit reached: ${tokenCount + tokens.length}`);
       }
+      // If we haven't added any messages yet, we need to include at least the last message
+      // even if it's too long, to avoid empty messages array
+      if (messagesToSend.length === 0) {
+        const tokenLimit = selectedModel?.tokenLimit || 128000;
+        const availableTokens = tokenLimit - tokenCount - 1000;
+        const errorMessage = "[Message too long for this model. Please try with a shorter message or a different model.]";
+        
+        if (availableTokens > 100) { // Ensure we have enough tokens for a meaningful truncation
+          // Calculate how much content we can actually fit
+          const maxContentTokens = availableTokens - 50; // Reserve tokens for truncation notice
+          const truncatedContent = message.content.slice(0, Math.floor(maxContentTokens * 3.5)); // Rough estimate: 1 token ≈ 3.5 chars
+          messagesToSend = [{
+            ...message,
+            content: truncatedContent + "\n\n[Message truncated due to length]"
+          }];
+        } else {
+          // If we can't fit even a truncated message, return an error response immediately
+          return new Response(errorMessage, {
+            status: 400,
+            headers: {
+              'Content-Type': 'text/plain; charset=utf-8',
+            },
+          });
+        }
+      }
       break;
     }
     tokenCount += tokens.length;
