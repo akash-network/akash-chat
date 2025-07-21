@@ -62,6 +62,28 @@ Qwen3 235B A22B delivers superior performance in complex logical reasoning, math
     deployUrl: 'https://console.akash.network/templates/akash-network-awesome-akash-Qwen3-235B-A22B-FP8'
   },
   {
+    id: 'Qwen3-235B-A22B-Instruct-2507-FP8',
+    name: 'Qwen3 235B A22B Instruct 2507',
+    description: 'Enhanced reasoning and alignment in a non-thinking model',
+    available: true,
+    temperature: 0.7,
+    top_p: 0.8,
+    tokenLimit: 262144,
+    parameters: '235B (22B active)',
+    architecture: 'Mixture-of-Experts (128 experts, 8 activated)',
+    hf_repo: 'Qwen/Qwen3-235B-A22B-Instruct-2507-FP8',
+    aboutContent: `Experience **Qwen3 235B A22B Instruct 2507**, the enhanced non-thinking mode version of Qwen3 with significant improvements across all capabilities. This updated model features substantial gains in instruction following, logical reasoning, mathematics, science, coding, and tool usage, along with markedly better alignment with user preferences.
+
+With native 262K context length support and enhanced long-context understanding, this model excels in subjective and open-ended tasks, delivering more helpful responses and higher-quality text generation across multiple languages.`,
+    infoContent: `
+* ⚡ Enhanced non-thinking mode with improved capabilities
+* 🧠 Native 262K context length for extended conversations
+* 🌐 Decentralized hosting for lower costs & full control
+* 🔍 Superior performance in reasoning, coding, and multilingual tasks`,
+    thumbnailId: 'llama-3',
+    deployUrl: 'https://console.akash.network/templates/akash-network-awesome-akash-Qwen3-235B-A22B-Instruct-2507-FP8'
+  },
+  {
     id: 'meta-llama-Llama-4-Maverick-17B-128E-Instruct-FP8',
     name: 'Llama 4 Maverick 17B 128E',
     description: '400B parameter model (17B active) with 128 experts',
@@ -277,5 +299,5 @@ With 405 billion parameters, this model excels at deep understanding, long-conte
 ];
 
 // in case the `DEFAULT_MODEL` environment variable is not set or set to an unsupported model
-export const fallbackModelID = 'Qwen3-235B-A22B-FP8';
+export const fallbackModelID = 'Qwen3-235B-A22B-Instruct-2507-FP8';
 export const defaultModel = process.env.DEFAULT_MODEL || fallbackModelID; 
