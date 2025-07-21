@@ -136,7 +136,7 @@ async function handlePostRequest(req: Request) {
             initialDelayInMs: 0, // Delay before the first chunk
             chunkDelayInMs: 0, // Delay between chunks
             chunks: [
-              `0:"<image_generation> jobId='${imageResult.jobId}' prompt='${imageResult.prompt}' negative='${imageResult.negative || ''}'</image_generation>"\n`,
+              `0:"<image_generation> jobId='${imageResult.jobId}' prompt='${String(imageResult.prompt).replace(/'/g, "\\'")}' negative='${String(imageResult.negative || '').replace(/'/g, "\\'")}'</image_generation>"\n`,
               `e:{"finishReason":"stop","usage":{"promptTokens":20,"completionTokens":50},"isContinued":false}\n`,
               `d:{"finishReason":"stop","usage":{"promptTokens":20,"completionTokens":50}}\n`,
             ],

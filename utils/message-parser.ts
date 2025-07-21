@@ -20,7 +20,7 @@ export const parseMessageContent = (content: string): MessageSection[] => {
   }
 
   // Parse image generation sections
-  const imageGenRegex = /<image_generation>\s*jobId='([^']+)'\s*prompt='([^']+)'\s*negative='([^']*)'\s*<\/image_generation>/g;
+  const imageGenRegex = /<image_generation>\s*jobId='([^']+)'\s*prompt='((?:[^'\\]|\\.)*)'\s*negative='((?:[^'\\]|\\.)*)'\s*<\/image_generation>/g;
   let lastIndex = 0;
   let match;
 
@@ -38,8 +38,8 @@ export const parseMessageContent = (content: string): MessageSection[] => {
       type: 'image_generation',
       content: match[0],
       jobId: match[1],
-      prompt: match[2],
-      negative: match[3]
+      prompt: match[2].replace(/\\'/g, "'"),
+      negative: match[3].replace(/\\'/g, "'")
     });
 
     lastIndex = match.index + match[0].length;
