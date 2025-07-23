@@ -18,26 +18,19 @@ export interface Model {
 
 export const models: Model[] = [
   {
-    id: 'DeepSeek-R1-0528',
-    name: 'DeepSeek R1 0528',
-    description: 'Strong Mixture-of-Experts (MoE) LLM',
+    id: 'Kimi-K2-Instruct',
+    name: 'Kimi K2 Instruct',
+    description: 'Advanced 1T Mixture-of-Experts model (32B active)',
     available: true,
     temperature: 0.6,
     top_p: 0.95,
-    tokenLimit: 64000,
-    parameters: '671B',
-    architecture: 'Mixture-of-Experts',
-    hf_repo: 'deepseek-ai/DeepSeek-R1-0528',
-    aboutContent: `Experience **DeepSeek R1 0528**, the latest iteration of DeepSeek's groundbreaking reasoning model. This advanced 671B parameter Mixture-of-Experts (MoE) architecture represents a significant leap forward in AI reasoning capabilities, featuring enhanced chain-of-thought processing and superior problem-solving abilities.
-
-The 0528 version introduces refined training techniques and improved reasoning pathways, making it exceptionally powerful for complex analytical tasks, mathematical reasoning, and multi-step problem solving. Built for professionals who demand the highest level of AI performance.`,
-    infoContent: `
-* ⚡ Latest DeepSeek R1 0528 with enhanced reasoning capabilities
-* 🧠 Advanced chain-of-thought processing with 671B parameters
-* 🌐 Decentralized hosting for cost-effective, unrestricted access
-* 🔍 Optimized for complex reasoning, analysis, and problem-solving tasks`,
-    thumbnailId: 'deepseek',
-    deployUrl: 'https://console.akash.network/templates/akash-network-awesome-akash-DeepSeek-R1-0528'
+    tokenLimit: 128000,
+    parameters: '1T (32B active)',
+    architecture: 'Mixture-of-Experts (384 experts, 8 activated)',
+    hf_repo: 'moonshotai/Kimi-K2-Instruct',
+    aboutContent: `Discover **Kimi K2 Instruct**, a next-generation Mixture-of-Experts (MoE) language model with 1 trillion total parameters and 32 billion activated per token. Trained on 15.5T tokens with the Muon optimizer, Kimi K2 achieves exceptional performance in knowledge, reasoning, coding, and agentic tasks. Specifically designed for tool use and autonomous problem-solving, it excels in both chat and agentic experiences.\n\nKimi K2 Instruct features a 128K context window, advanced MLA attention, and robust instruction-following capabilities. It is a top performer on coding, reasoning, and tool-use benchmarks, making it ideal for demanding AI applications.`,
+    infoContent: `\n* ⚡ 1T parameter Mixture-of-Experts model (32B active)\n* 🧠 128K context window for extended conversations\n* 🛠️ Optimized for tool use, reasoning, and agentic intelligence\n* 🌐 Open-source, deployable on vLLM, SGLang, KTransformers, TensorRT-LLM\n* 🔍 Top-tier performance in coding, reasoning, and tool-use tasks`,
+    thumbnailId: 'llama-3',
   },
   {
     id: 'Qwen3-235B-A22B-FP8',
@@ -82,6 +75,28 @@ With native 262K context length support and enhanced long-context understanding,
 * 🔍 Superior performance in reasoning, coding, and multilingual tasks`,
     thumbnailId: 'llama-3',
     deployUrl: 'https://console.akash.network/templates/akash-network-awesome-akash-Qwen3-235B-A22B-Instruct-2507-FP8'
+  },
+  {
+    id: 'DeepSeek-R1-0528',
+    name: 'DeepSeek R1 0528',
+    description: 'Strong Mixture-of-Experts (MoE) LLM',
+    available: true,
+    temperature: 0.6,
+    top_p: 0.95,
+    tokenLimit: 64000,
+    parameters: '671B',
+    architecture: 'Mixture-of-Experts',
+    hf_repo: 'deepseek-ai/DeepSeek-R1-0528',
+    aboutContent: `Experience **DeepSeek R1 0528**, the latest iteration of DeepSeek's groundbreaking reasoning model. This advanced 671B parameter Mixture-of-Experts (MoE) architecture represents a significant leap forward in AI reasoning capabilities, featuring enhanced chain-of-thought processing and superior problem-solving abilities.
+
+The 0528 version introduces refined training techniques and improved reasoning pathways, making it exceptionally powerful for complex analytical tasks, mathematical reasoning, and multi-step problem solving. Built for professionals who demand the highest level of AI performance.`,
+    infoContent: `
+* ⚡ Latest DeepSeek R1 0528 with enhanced reasoning capabilities
+* 🧠 Advanced chain-of-thought processing with 671B parameters
+* 🌐 Decentralized hosting for cost-effective, unrestricted access
+* 🔍 Optimized for complex reasoning, analysis, and problem-solving tasks`,
+    thumbnailId: 'deepseek',
+    deployUrl: 'https://console.akash.network/templates/akash-network-awesome-akash-DeepSeek-R1-0528'
   },
   {
     id: 'meta-llama-Llama-4-Maverick-17B-128E-Instruct-FP8',
