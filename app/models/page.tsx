@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 
 import { ModelsPageClient } from '@/components/models/models-page-client';
+import { getAvailableModels } from '@/lib/models';
 
 export const metadata: Metadata = {
   title: 'AI Models - AkashChat',
@@ -31,6 +32,8 @@ export const metadata: Metadata = {
   publisher: 'Akash Network',
 };
 
-export default function ModelsPage() {
-  return <ModelsPageClient />;
+export default async function ModelsPage() {
+  const models = await getAvailableModels();
+  
+  return <ModelsPageClient models={models} />;
 } 

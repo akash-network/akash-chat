@@ -161,12 +161,7 @@ async function handlePostRequest(req: Request) {
 
   return createDataStreamResponse({
     execute: dataStream => {
-      let systemToUse = system || DEFAULT_SYSTEM_PROMPT;
-      // temporary: set system prompt to undefined if model is 'kimi-k2'
-      const isKimi = (model || '').toLowerCase() === 'kimi-k2-instruct';
-      if (isKimi) {
-        systemToUse = undefined;
-      }
+      const systemToUse = system || DEFAULT_SYSTEM_PROMPT;
       const result = streamText({
         model: openai(model || defaultModel),
         messages: messagesToSend,

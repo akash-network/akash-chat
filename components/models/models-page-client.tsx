@@ -1,7 +1,6 @@
 'use client';
 
-import { motion } from "framer-motion";
-import { AlertCircle, Gauge, Info, Layers, Settings } from "lucide-react";
+import { Gauge, Info, Layers, Settings } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 import { Model } from "@/app/config/models";
@@ -9,18 +8,19 @@ import { useChatContext } from "@/app/context/ChatContext";
 import { cn } from "@/lib/utils";
 
 import { ModelThumbnail } from "../branding/model-thumbnail";
-export function ModelsPageClient() {
+
+interface ModelsPageClientProps {
+    models: Model[];
+}
+
+export function ModelsPageClient({ models }: ModelsPageClientProps) {
     const {
-        availableModels: models,
-        modelError: error,
         setModelSelection,
     } = useChatContext();
     const router = useRouter();
 
     const handleModelClick = (model: Model) => {
-        if (!model.available) {return;}
-
-        // Start a chat with this model
+        // All models passed from server are available
         setModelSelection(model.id);
         router.push('/models/' + model.id);
     };
@@ -35,17 +35,6 @@ export function ModelsPageClient() {
                     </p>
                 </header>
 
-                {error && (
-                    <motion.div
-                        className="flex items-center gap-3 p-4 text-destructive bg-destructive/10 rounded-lg mb-6"
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                    >
-                        <AlertCircle className="h-5 w-5 shrink-0" />
-                        <p className="flex-1">{error}</p>
-                    </motion.div>
-                )}
-
                 {/* Models Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {models.map((model: Model) => (
@@ -56,8 +45,7 @@ export function ModelsPageClient() {
                                 "group/card rounded-lg border cursor-pointer bg-background text-foreground",
                                 "outline outline-2 -outline-offset-2 outline-primary/0 transition-all",
                                 "hover:shadow-lg hover:outline-primary/30 hover:translate-y-[-2px] focus-visible:outline-primary",
-                                "flex h-full flex-col animate-fade-in relative",
-                                !model.available && "opacity-70 hover:translate-y-[0px]"
+                                "flex h-full flex-col animate-fade-in relative"
                             )}
                         >
                             <div className="p-4 pt-4 h-[9.5rem] overflow-hidden">
@@ -108,19 +96,12 @@ export function ModelsPageClient() {
                                         </div>
                                     )}
 
-                                    {/* Availability badge */}
-                                    <div className={cn(
-                                        "inline-flex items-center gap-1 whitespace-nowrap border font-medium border-border-contrast bg-transparent rounded-[0.25rem] h-6 px-2 text-xs",
-                                        model.available
-                                            ? "text-muted-foreground"
-                                            : "text-muted-foreground/60"
-                                    )}>
-                                        {model.available && (
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-sparkle fill-muted-foreground">
-                                                <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"></path>
-                                            </svg>
-                                        )}
-                                        {model.available ? "Available" : "Unavailable"}
+                                    {/* Availability badge - all server-side models are available */}
+                                    <div className="inline-flex items-center gap-1 whitespace-nowrap border font-medium border-border-contrast bg-transparent rounded-[0.25rem] h-6 px-2 text-xs text-muted-foreground">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-sparkle fill-muted-foreground">
+                                            <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"></path>
+                                        </svg>
+                                        Available
                                     </div>
                                 </div>
                             </div>

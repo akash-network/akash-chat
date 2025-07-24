@@ -23,6 +23,9 @@ export async function getAvailableModels(): Promise<Model[]> {
         const isProxy = apiModels.data.some((apiModel: OpenAI.Model) => apiModel.owned_by === 'proxy')
         const isChatApi = apiEndpoint.includes('chatapi.akash.network');
         const availableModels = models.filter(model => 
+            // If model has explicit available: true, include it
+            model.available === true || 
+            // Otherwise check if it's in the API
             apiModels.data.some((apiModel: OpenAI.Model) => apiModel.id === model.id)
         );
 
@@ -39,12 +42,17 @@ export async function getAvailableModels(): Promise<Model[]> {
                 available: true,
                 owned_by: apiModel.owned_by
             }));
+        const explicitlyAvailableModels = models.filter(model => model.available === true);
+        
         // Combine all models and add AkashGen
         const allModels = [
-            ...(!isProxy && !isChatApi ? availableModels : []), 
+            ...(!isProxy && !isChatApi ? availableModels : explicitlyAvailableModels), 
             ...additionalModels,
             ...(!isProxy && !isChatApi && models.find(model => model.id === 'AkashGen') ? [models.find(model => model.id === 'AkashGen')] : [])
-        ].filter(Boolean) as Model[];
+        ].filter(Boolean).map(model => ({
+            ...model,
+            available: true  // Ensure all returned models have available: true
+        })) as Model[];
         await redis.setex(MODELS_CACHE_KEY, MODELS_CACHE_TTL, JSON.stringify(allModels));
 
         return allModels;

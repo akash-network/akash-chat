@@ -2,7 +2,7 @@ export interface Model {
   id: string;
   name: string;
   description?: string;
-  available: boolean;
+  available?: boolean;
   temperature?: number;
   top_p?: number;
   tokenLimit?: number;
@@ -21,7 +21,6 @@ export const models: Model[] = [
     id: 'Kimi-K2-Instruct',
     name: 'Kimi K2 Instruct',
     description: 'Advanced 1T Mixture-of-Experts model (32B active)',
-    available: true,
     temperature: 0.6,
     top_p: 0.95,
     tokenLimit: 128000,
@@ -36,7 +35,6 @@ export const models: Model[] = [
     id: 'Qwen3-235B-A22B-FP8',
     name: 'Qwen3 235B A22B',
     description: 'Advanced reasoning model with 235B parameters (22B active)',
-    available: true,
     temperature: 0.6,
     top_p: 0.95,
     tokenLimit: 128000,
@@ -58,7 +56,6 @@ Qwen3 235B A22B delivers superior performance in complex logical reasoning, math
     id: 'Qwen3-235B-A22B-Instruct-2507-FP8',
     name: 'Qwen3 235B A22B Instruct 2507',
     description: 'Enhanced reasoning and alignment in a non-thinking model',
-    available: true,
     temperature: 0.7,
     top_p: 0.8,
     tokenLimit: 262144,
@@ -77,10 +74,30 @@ With native 262K context length support and enhanced long-context understanding,
     deployUrl: 'https://console.akash.network/templates/akash-network-awesome-akash-Qwen3-235B-A22B-Instruct-2507-FP8'
   },
   {
+    id: 'Qwen3-235B-A22B-Thinking-2507-FP8',
+    name: 'Qwen3 235B A22B Thinking 2507',
+    description: 'Advanced thinking model with enhanced reasoning capabilities',
+    temperature: 0.6,
+    top_p: 0.95,
+    tokenLimit: 262144,
+    parameters: '235B (22B active)',
+    architecture: 'Mixture-of-Experts (128 experts, 8 activated)',
+    hf_repo: 'Qwen/Qwen3-235B-A22B-Thinking-2507-FP8',
+    aboutContent: `Experience **Qwen3 235B A22B Thinking 2507 FP8**, the thinking mode version of Qwen3 with state-of-the-art reasoning capabilities. This advanced model features automatic thinking processes using <think> tags, delivering enhanced performance in complex reasoning, mathematics, science, and coding tasks.
+
+With native 262K context length support and improved long-context understanding, this model excels in multi-step problem solving and provides transparent reasoning through its thinking mode, making it ideal for complex analytical tasks.`,
+    infoContent: `
+* ⚡ Advanced thinking mode with transparent reasoning process
+* 🧠 Native 262K context length for extended conversations
+* 🌐 Decentralized hosting for lower costs & full control
+* 🔍 State-of-the-art performance in reasoning, math, science, and coding`,
+    thumbnailId: 'llama-3',
+    deployUrl: 'https://console.akash.network/templates/akash-network-awesome-akash-Qwen3-235B-A22B-Thinking-2507-FP8'
+  },
+  {
     id: 'DeepSeek-R1-0528',
     name: 'DeepSeek R1 0528',
     description: 'Strong Mixture-of-Experts (MoE) LLM',
-    available: true,
     temperature: 0.6,
     top_p: 0.95,
     tokenLimit: 64000,
@@ -102,7 +119,6 @@ The 0528 version introduces refined training techniques and improved reasoning p
     id: 'meta-llama-Llama-4-Maverick-17B-128E-Instruct-FP8',
     name: 'Llama 4 Maverick 17B 128E',
     description: '400B parameter model (17B active) with 128 experts',
-    available: true,
     temperature: 0.6,
     top_p: 0.9,
     tokenLimit: 128000,
@@ -124,7 +140,6 @@ AkashChat provides a fast, user-friendly interface to chat with Llama 4 Maverick
     id: 'nvidia-Llama-3-3-Nemotron-Super-49B-v1',
     name: 'Llama 3.3 Nemotron Super 49B',
     description: 'Great tradeoff between model accuracy and efficiency',
-    available: true,
     temperature: 0.6,
     top_p: 0.95,
     tokenLimit: 128000,
@@ -146,7 +161,6 @@ Powered by NVIDIA's cutting-edge design, Nemotron Super 49B is perfect for devel
     id: 'Qwen-QwQ-32B',
     name: 'Qwen QwQ-32B',
     description: 'Medium-sized reasoning model with enhanced performance',
-    available: true,
     temperature: 0.6,
     top_p: 0.95,
     tokenLimit: 128000,
@@ -168,7 +182,6 @@ Qwen QwQ-32B blends fast inference with high accuracy, making it ideal for resea
     id: 'Meta-Llama-3-3-70B-Instruct',
     name: 'Llama 3.3 70B',
     description: 'Well-rounded model with strong capabilities',
-    available: true,
     temperature: 0.6,
     top_p: 0.9,
     tokenLimit: 128000,
@@ -190,7 +203,6 @@ Enjoy top-tier performance and low-latency interaction without needing to config
     id: 'DeepSeek-R1',
     name: 'DeepSeek R1 671B',
     description: 'Strong Mixture-of-Experts (MoE) LLM',
-    available: true,
     temperature: 0.6,
     top_p: 0.95,
     tokenLimit: 64000,
@@ -212,7 +224,6 @@ Built to scale, DeepSeek R1 uses expert routing to reduce compute while maximizi
     id: 'Meta-Llama-3-1-405B-Instruct-FP8',
     name: 'Llama 3.1 405B',
     description: 'Most capable model for complex tasks',
-    available: true,
     temperature: 0.6,
     top_p: 0.9,
     tokenLimit: 60000,
@@ -234,7 +245,6 @@ With 405 billion parameters, this model excels at deep understanding, long-conte
     id: 'Meta-Llama-3-2-3B-Instruct',
     name: 'Llama 3.2 3B',
     description: 'Fast model for quick responses',
-    available: false,
     temperature: 0.6,
     top_p: 0.9,
     tokenLimit: 128000,
@@ -256,7 +266,6 @@ With 405 billion parameters, this model excels at deep understanding, long-conte
     id: 'Meta-Llama-3-1-8B-Instruct-FP8',
     name: 'Llama 3.1 8B',
     description: 'Efficient model for basic tasks',
-    available: false,
     temperature: 0.6,
     top_p: 0.9,
     tokenLimit: 128000,
@@ -278,7 +287,6 @@ With 405 billion parameters, this model excels at deep understanding, long-conte
     id: 'mistral',
     name: 'Mistral-7B',
     description: 'Balanced model for general use',
-    available: false,
     temperature: 0.7,
     top_p: 0.95,
     tokenLimit: 32768,
@@ -300,7 +308,6 @@ With 405 billion parameters, this model excels at deep understanding, long-conte
     id: 'AkashGen',
     name: 'AkashGen',
     description: 'Generate images using AkashGen',
-    available: true,
     temperature: 0.85,
     top_p: 1,
     tokenLimit: 12000,
