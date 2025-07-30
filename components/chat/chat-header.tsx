@@ -6,7 +6,6 @@ import { useRouter, usePathname } from 'next/navigation';
 
 import { Model } from '@/app/config/models';
 import { AkashChatLogo } from '@/components/branding/akash-chat-logo';
-import { ThemeToggle } from '@/components/theme-toggle';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -130,7 +129,7 @@ export function ChatHeader({
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-        <ThemeToggle />
+
       </div>
     </header>
   );

@@ -1,15 +1,13 @@
 import { createOpenAI } from '@ai-sdk/openai';
 import { streamText, createDataStreamResponse, generateText, simulateReadableStream, Message } from 'ai';
+import cl100k_base from "tiktoken/encoders/cl100k_base.json";
+import { Tiktoken } from "tiktoken/lite";
 
 import { apiEndpoint, apiKey, imgGenFnModel, DEFAULT_SYSTEM_PROMPT } from '@/app/config/api';
 import { defaultModel, models } from '@/app/config/models';
 import { withAuth } from '@/lib/auth';
 import { getAvailableModels } from '@/lib/models';
 import { generateImageTool } from '@/lib/tools';
-
-const cl100k_base = require("tiktoken/encoders/cl100k_base.json");
-const { Tiktoken } = require("tiktoken/lite");
-
 // Allow streaming responses up to 30 seconds
 export const maxDuration = 30;
 
@@ -49,7 +47,9 @@ async function handlePostRequest(req: Request) {
     for (const file of context) {
       const tokens = encoding.encode(file.content);
       if (tokenCount + tokens.length + 1000 > (selectedModel?.tokenLimit || 128000)) {
-        console.log(`Token limit reached: ${tokenCount + tokens.length}`);
+        if (process.env.NODE_ENV === 'development') {
+          console.log(`Token limit reached: ${tokenCount + tokens.length}`);
+        }
         return new Response('Your files have too much content for this model. Please remove some files or try a different model.', {
           status: 400,
           headers: {
@@ -66,7 +66,34 @@ async function handlePostRequest(req: Request) {
     const tokens = encoding.encode(message.content);
 
     if (tokenCount + tokens.length + 1000 > (selectedModel?.tokenLimit || 128000)) {
-      console.log(`Token limit reached: ${tokenCount + tokens.length}`);
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`Token limit reached: ${tokenCount + tokens.length}`);
+      }
+      // If we haven't added any messages yet, we need to include at least the last message
+      // even if it's too long, to avoid empty messages array
+      if (messagesToSend.length === 0) {
+        const tokenLimit = selectedModel?.tokenLimit || 128000;
+        const availableTokens = tokenLimit - tokenCount - 1000;
+        const errorMessage = "[Message too long for this model. Please try with a shorter message or a different model.]";
+        
+        if (availableTokens > 100) { // Ensure we have enough tokens for a meaningful truncation
+          // Calculate how much content we can actually fit
+          const maxContentTokens = availableTokens - 50; // Reserve tokens for truncation notice
+          const truncatedContent = message.content.slice(0, Math.floor(maxContentTokens * 3.5)); // Rough estimate: 1 token ≈ 3.5 chars
+          messagesToSend = [{
+            ...message,
+            content: truncatedContent + "\n\n[Message truncated due to length]"
+          }];
+        } else {
+          // If we can't fit even a truncated message, return an error response immediately
+          return new Response(errorMessage, {
+            status: 400,
+            headers: {
+              'Content-Type': 'text/plain; charset=utf-8',
+            },
+          });
+        }
+      }
       break;
     }
     tokenCount += tokens.length;
@@ -109,7 +136,7 @@ async function handlePostRequest(req: Request) {
             initialDelayInMs: 0, // Delay before the first chunk
             chunkDelayInMs: 0, // Delay between chunks
             chunks: [
-              `0:"<image_generation> jobId='${imageResult.jobId}' prompt='${imageResult.prompt}' negative='${imageResult.negative || ''}'</image_generation>"\n`,
+              `0:"<image_generation> jobId='${imageResult.jobId}' prompt='${String(imageResult.prompt).replace(/'/g, "\\'")}' negative='${String(imageResult.negative || '').replace(/'/g, "\\'")}'</image_generation>"\n`,
               `e:{"finishReason":"stop","usage":{"promptTokens":20,"completionTokens":50},"isContinued":false}\n`,
               `d:{"finishReason":"stop","usage":{"promptTokens":20,"completionTokens":50}}\n`,
             ],
@@ -134,14 +161,14 @@ async function handlePostRequest(req: Request) {
 
   return createDataStreamResponse({
     execute: dataStream => {
+      const systemToUse = system || DEFAULT_SYSTEM_PROMPT;
       const result = streamText({
         model: openai(model || defaultModel),
         messages: messagesToSend,
-        system: system || DEFAULT_SYSTEM_PROMPT,
+        system: systemToUse,
         temperature: temperature || selectedModel?.temperature,
         topP: topP || selectedModel?.top_p,
       });
-
       result.mergeIntoDataStream(dataStream);
     },
     onError: error => {

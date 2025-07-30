@@ -1,7 +1,7 @@
 import { Message as AIMessage } from 'ai';
 import { motion } from 'framer-motion';
 import { AlertCircle } from 'lucide-react';
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, useCallback } from 'react';
 import { useWindowSize } from 'usehooks-ts';
 
 import { AI_NOTICE } from '@/app/config/genimg';
@@ -14,6 +14,7 @@ interface ChatMessagesProps {
   messages: AIMessage[];
   input: string;
   isLoading: boolean;
+  status: 'submitted' | 'streaming' | 'ready' | 'error';
   contextFiles: ContextFile[];
   setContextFiles: (files: ContextFile[]) => void;
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>) => void;
@@ -32,6 +33,7 @@ export function ChatMessages({
   messages,
   input,
   isLoading,
+  status,
   contextFiles,
   setContextFiles,
   handleInputChange,
@@ -50,13 +52,17 @@ export function ChatMessages({
   const [autoScroll, setAutoScroll] = useState(true);
   const { width: windowWidth } = useWindowSize();
   const isMobile = windowWidth ? windowWidth < 768 : false;
+  const resizeObserverRef = useRef<ResizeObserver | null>(null);
+  const animationFrameRef = useRef<number | null>(null);
+  const lastStatusRef = useRef<string>(status);
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const scrollToBottom = () => {
+  const scrollToBottom = useCallback(() => {
     const container = messagesContainerRef.current;
     if (container && autoScroll) {
       container.scrollTop = container.scrollHeight;
     }
-  };
+  }, [autoScroll]);
 
   const handleScroll = () => {
     const container = messagesContainerRef.current;
@@ -70,11 +76,120 @@ export function ChatMessages({
     }
   };
 
+  // Smooth scroll during animation
+  const scheduleScroll = useCallback(() => {
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current);
+    }
+    
+    animationFrameRef.current = requestAnimationFrame(() => {
+      if (isLoading || status === 'streaming') {
+        scrollToBottom();
+        // Continue checking while streaming
+        scheduleScroll();
+      }
+    });
+  }, [isLoading, status, scrollToBottom]);
+
+  // Enhanced scroll trigger for delayed DOM updates
+  const triggerDelayedScroll = useCallback((delay: number = 150) => {
+    if (scrollTimeoutRef.current) {
+      clearTimeout(scrollTimeoutRef.current);
+    }
+    
+    if (autoScroll) {
+      scrollTimeoutRef.current = setTimeout(() => {
+        scrollToBottom();
+        // Double-check after a longer delay for complex DOM updates
+        setTimeout(() => {
+          if (autoScroll) {
+            scrollToBottom();
+          }
+        }, 100);
+      }, delay);
+    }
+  }, [autoScroll, scrollToBottom]);
+
+  // Scroll when messages change
   useEffect(() => {
     if (messages.length > 0) {
       scrollToBottom();
     }
-  }, [messages]);
+  }, [messages, scrollToBottom]);
+
+  // Handle streaming auto-scroll and status changes
+  useEffect(() => {
+    const currentStatus = status;
+    const previousStatus = lastStatusRef.current;
+    
+    if ((isLoading || status === 'streaming') && autoScroll) {
+      scheduleScroll();
+    } else if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current);
+      animationFrameRef.current = null;
+      
+      // Handle status transitions that might affect content rendering
+      if (autoScroll) {
+        if (previousStatus === 'streaming' && (currentStatus === 'ready' || currentStatus === 'error')) {
+          // Status changed from streaming to complete - trigger extended delay scroll
+          triggerDelayedScroll(200);
+        } else {
+          // Regular completion scroll
+          triggerDelayedScroll(100);
+        }
+      }
+    }
+
+    lastStatusRef.current = currentStatus;
+
+    return () => {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+    };
+  }, [isLoading, status, autoScroll, scheduleScroll, triggerDelayedScroll]);
+
+  // Enhanced ResizeObserver to detect height changes from all content updates
+  useEffect(() => {
+    const container = messagesContainerRef.current;
+    if (!container) { return; }
+
+    // Clean up previous observer
+    if (resizeObserverRef.current) {
+      resizeObserverRef.current.disconnect();
+    }
+
+    // Create ResizeObserver to watch for container size changes
+    resizeObserverRef.current = new ResizeObserver(() => {
+      if (autoScroll) {
+        // During active streaming/loading, scroll immediately
+        if (isLoading || status === 'streaming') {
+          scrollToBottom();
+        } else {
+          // For post-completion changes (like animation finishing), use delayed scroll
+          triggerDelayedScroll(50);
+        }
+      }
+    });
+
+    // Observe the messages container
+    resizeObserverRef.current.observe(container);
+
+    return () => {
+      if (resizeObserverRef.current) {
+        resizeObserverRef.current.disconnect();
+      }
+    };
+  }, [autoScroll, isLoading, status, scrollToBottom, triggerDelayedScroll]);
+
+  // Cleanup timeouts on unmount
+  useEffect(() => {
+    return () => {
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+    };
+  }, []);
 
   return (
     <>
@@ -103,9 +218,6 @@ export function ChatMessages({
                   isInitialized={sessionInitialized}
                 />
               </div>
-              <p className="text-xs sm:text-sm text-muted-foreground text-center px-4">
-                {AI_NOTICE}
-              </p>
             </div>
           ) : (
             <>
@@ -115,6 +227,7 @@ export function ChatMessages({
                   message={message}
                   messageIndex={index}
                   isLoading={isLoading && message.id === messages[messages.length - 1]?.id}
+                  status={status}
                   onRegenerate={message.role === 'assistant' ? async () => {
                     const precedingUserMessage = messages[index - 1];
                     if (precedingUserMessage?.role === 'user') {

@@ -32,6 +32,7 @@ export function ChatHome() {
     handleInputChange,
     handleSubmit,
     isLoading,
+    status,
     contextFiles,
     setContextFiles,
     reload,
@@ -100,6 +101,7 @@ export function ChatHome() {
         messages={messages}
         input={input}
         isLoading={isLoading}
+        status={status}
         contextFiles={contextFiles}
         setContextFiles={setContextFiles}
         handleInputChange={handleInputChange}
