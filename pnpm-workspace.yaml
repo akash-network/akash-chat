@@ -1,9 +1,12 @@
 packages:
   - '.'
 
-onlyBuiltDependencies:
-  - esbuild
-  - sharp
-  - unrs-resolver
+overrides:
+  serialize-javascript: '>=6.0.2'
+
+allowBuilds:
+  esbuild: true
+  sharp: true
+  unrs-resolver: true
 
 minimumReleaseAge: 10080
