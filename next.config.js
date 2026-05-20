@@ -27,6 +27,7 @@ const nextConfig = {
   reactStrictMode: true,
   // Improve SEO with trailing slashes
   trailingSlash: true,
+  skipTrailingSlashRedirect: true,
   // Compress output
   compress: true,
   // Handle Auth0 compatibility with Next.js 15
