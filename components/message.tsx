@@ -85,7 +85,7 @@ const ImageGenerationSection = ({ jobId, prompt, negative }: { jobId: string, pr
   useEffect(() => {
     const checkStatus = async () => {
       try {
-        const response = await fetch(`/api/image-status?ids=${jobId}`);
+        const response = await fetch(`/api/image-status?ids=${encodeURIComponent(jobId)}`);
         
         if (response.status === 404) {
           setErrorCount(prev => {

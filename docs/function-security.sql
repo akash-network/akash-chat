@@ -134,6 +134,7 @@ AS $$
     parent_chat_id = EXCLUDED.parent_chat_id,
     branched_at_index = EXCLUDED.branched_at_index,
     updated_at = NOW()
+  WHERE chat_sessions.user_id = EXCLUDED.user_id
   RETURNING *;
 $$;
 

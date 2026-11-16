@@ -286,6 +286,31 @@ export function clearUserChatsFromLocalStorage(): void {
   }
 }
 
+// Removed by cleanupUserDataOnLogout along with the other 'sync-' keys
+const ACCOUNT_DATA_OWNER_KEY = 'sync-account';
+
+/**
+ * Record which account the synced data in localStorage belongs to
+ */
+export function markAccountDataOwner(userId: string): void {
+  safeSetItem(ACCOUNT_DATA_OWNER_KEY, userId);
+}
+
+/**
+ * Sessions that end by expiry or a direct /api/auth/logout skip the logout button's cleanup, so the
+ * previous account's prompts would be shown to (and sent by) whoever uses the browser next.
+ * Returns true when stale data was removed and the page must reload to drop it from React state.
+ */
+export function cleanupStaleAccountData(currentUserId: string | null | undefined): boolean {
+  const owner = localStorage.getItem(ACCOUNT_DATA_OWNER_KEY);
+  if (!owner || owner === currentUserId) {
+    return false;
+  }
+  cleanupUserDataOnLogout();
+  localStorage.removeItem(ACCOUNT_DATA_OWNER_KEY);
+  return true;
+}
+
 /**
  * Comprehensive cleanup of all user data on logout
  * This ensures no sensitive data persists between user sessions

@@ -55,6 +55,11 @@ export async function POST(request: Request) {
             return NextResponse.json({ success: true });
         }
 
+        // Only rotate a session that exists; anything else must go through /api/auth/session and its access token check
+        if (!await validateSession(currentToken)) {
+            return NextResponse.json({ error: 'Invalid session token' }, { status: 401 });
+        }
+
         if (await isRateLimited(currentToken)) {
             return NextResponse.json(
                 { error: 'Too many refresh attempts. Please try again later.' },
@@ -62,13 +67,13 @@ export async function POST(request: Request) {
             );
         }
         const ttl = await redis!.ttl(`session:${currentToken}`);
-        const isValid = await validateSession(currentToken);
 
-        if (isValid && ttl > CACHE_TTL * 0.20) {
+        if (ttl > CACHE_TTL * 0.20) {
             return NextResponse.json({ success: true });
         }
         const newToken = crypto.randomBytes(32).toString('hex');
         await storeSession(newToken);
+        await redis!.del(`session:${currentToken}`);
 
         const response = NextResponse.json({ success: true });
 

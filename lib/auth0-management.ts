@@ -21,6 +21,13 @@ class Auth0ManagementService {
   private readonly REDIS_KEY = 'auth0:management:token';
   private readonly CONSENT_CACHE_KEY = 'auth0:marketing_consent';
 
+  // The Management API rate limit is shared by the whole tenant, so one user's repeated
+  // requests must not each turn into a live lookup
+  private readonly USER_DATA_TTL_MS = 30 * 1000;
+  private readonly MAX_CACHED_USERS = 1000;
+  private userDataCache = new Map<string, { data: any; expiresAt: number }>();
+  private userDataRequests = new Map<string, Promise<any>>();
+
   private async fetchNewToken(): Promise<Auth0Token> {
     const issuerBaseUrl = process.env.AUTH0_MGMT_BASE_URL || process.env.AUTH0_ISSUER_BASE_URL;
     if (!issuerBaseUrl) {
@@ -158,6 +165,22 @@ class Auth0ManagementService {
   }
 
   async getUserData(userId: string): Promise<any> {
+    const cached = this.userDataCache.get(userId);
+    if (cached && cached.expiresAt > Date.now()) {
+      return cached.data;
+    }
+
+    const pending = this.userDataRequests.get(userId);
+    if (pending) {
+      return pending;
+    }
+
+    const request = this.fetchUserData(userId).finally(() => this.userDataRequests.delete(userId));
+    this.userDataRequests.set(userId, request);
+    return request;
+  }
+
+  private async fetchUserData(userId: string): Promise<any> {
     const token = await this.getToken();
     const issuerBaseUrl = process.env.AUTH0_MGMT_BASE_URL || process.env.AUTH0_ISSUER_BASE_URL;
     
@@ -174,7 +197,13 @@ class Auth0ManagementService {
     }
 
     const userData = await response.json();
-    
+
+    const oldestUserId = this.userDataCache.keys().next().value;
+    if (this.userDataCache.size >= this.MAX_CACHED_USERS && oldestUserId !== undefined) {
+      this.userDataCache.delete(oldestUserId);
+    }
+    this.userDataCache.set(userId, { data: userData, expiresAt: Date.now() + this.USER_DATA_TTL_MS });
+
     // Cache marketing consent if it's true
     const marketingConsent = userData.user_metadata?.marketing_consent || false;
     if (marketingConsent) {
@@ -214,6 +243,8 @@ class Auth0ManagementService {
       const error = await response.text();
       throw new Error(`Failed to update user metadata: ${error}`);
     }
+
+    this.userDataCache.delete(userId);
 
     // Update cache if marketing consent was changed
     if ('marketing_consent' in metadata) {

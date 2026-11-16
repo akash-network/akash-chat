@@ -110,6 +110,13 @@ const components: Partial<Components> = {
       </blockquote>
     );
   },
+  img: ({ node, src, alt, ...props }) => {
+    // Loading a model-chosen URL can leak the conversation through its query string, so only our own generated images render
+    if (typeof src === 'string' && src.startsWith('/api/image/')) {
+      return <img src={src} alt={alt} {...props} />;
+    }
+    return <span>{alt || src}</span>;
+  },
 };
 
 const remarkPlugins = [remarkGfm, remarkMath];

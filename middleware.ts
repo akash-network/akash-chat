@@ -1,7 +1,21 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
+const STATE_CHANGING_METHODS = ['POST', 'PUT', 'PATCH', 'DELETE'];
+
 export function middleware(request: NextRequest) {
+  // API writes authenticate with ambient cookies, so reject ones a browser reports as coming from another site or subdomain
+  const fetchSite = request.headers.get('sec-fetch-site');
+  if (
+    request.nextUrl.pathname.startsWith('/api/') &&
+    STATE_CHANGING_METHODS.includes(request.method) &&
+    fetchSite &&
+    fetchSite !== 'same-origin' &&
+    fetchSite !== 'none'
+  ) {
+    return NextResponse.json({ error: 'Cross-site request blocked' }, { status: 403 });
+  }
+
   if (process.env.NODE_ENV !== 'production') {
     return NextResponse.next();
   }

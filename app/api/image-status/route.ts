@@ -10,7 +10,8 @@ export async function GET(req: Request) {
     }
 
     // Forward the request to check status with cache-busting
-    const response = await fetch(`${imgEndpoint}/status?ids=${ids}&_t=${Date.now()}`, {
+    const query = new URLSearchParams({ ids, _t: Date.now().toString() });
+    const response = await fetch(`${imgEndpoint}/status?${query}`, {
       headers: {
         'Authorization': `Bearer ${imgApiKey}`,
         'Content-Type': 'application/json',

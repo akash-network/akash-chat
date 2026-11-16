@@ -27,9 +27,13 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: lowercase github.repository
+        # Branch names are attacker-chosen text, so pass them as data instead of interpolating them into the script
+        env:
+          REPOSITORY: ${{ github.repository }}
+          REF_NAME: ${{ github.ref_name }}
         run: |
-          echo "IMAGE_NAME=`echo ${{github.repository}} | tr '[:upper:]' '[:lower:]'`" >>${GITHUB_ENV}
-          echo "SAFE_REF_NAME=`echo ${{github.ref_name}} | tr '/' '-'`" >>${GITHUB_ENV}
+          echo "IMAGE_NAME=$(printf '%s' "$REPOSITORY" | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_ENV"
+          echo "SAFE_REF_NAME=$(printf '%s' "$REF_NAME" | tr -c 'A-Za-z0-9_.-' '-')" >> "$GITHUB_ENV"
       
       - name: Bump version and push tag
         id: tag_version
@@ -68,5 +72,6 @@ jobs:
             NEXT_PUBLIC_VERSION=${{ env.SAFE_REF_NAME }}
           labels: |
             org.opencontainers.image.source=https://github.com/${{ github.repository }}
+          # Prefixed so a branch named "latest" or "1.2.3" can't overwrite the release tags
           tags: |
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.SAFE_REF_NAME }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:branch-${{ env.SAFE_REF_NAME }}

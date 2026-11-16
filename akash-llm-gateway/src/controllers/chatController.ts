@@ -24,6 +24,12 @@ export async function handleChatCompletion(req: Request, res: Response): Promise
     }
   } catch (error) {
     logger.error('Error in chat completion:', error);
+    // A stream that fails after headers were sent can't switch to a JSON error; writing one throws and,
+    // as an unhandled rejection, takes down the whole process
+    if (res.headersSent) {
+      res.end();
+      return;
+    }
     res.status(500).json({ error: 'Internal server error' });
   }
 } 

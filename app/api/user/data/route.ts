@@ -13,9 +13,6 @@ export const GET = withErrorHandling(
     const url = new URL(request.url);
     const limit = Math.min(parseInt(url.searchParams.get('limit') || '50'), 100); // Max 100 chats
     const offset = parseInt(url.searchParams.get('offset') || '0');
-    
-    // Check if client provided If-Modified-Since header for conditional requests
-    const ifModifiedSince = request.headers.get('If-Modified-Since');
 
     // Create services
     const dbService = createDatabaseService(userId);
@@ -262,20 +259,6 @@ export const GET = withErrorHandling(
       ? new Date(Math.max(...timestamps.map(t => t.getTime())))
       : new Date();
 
-    // Check if client's cached version is still valid
-    if (ifModifiedSince) {
-      const clientCacheDate = new Date(ifModifiedSince);
-      if (clientCacheDate >= lastModified) {
-        return new NextResponse(null, { 
-          status: 304,
-          headers: {
-            'Last-Modified': lastModified.toUTCString(),
-            'Cache-Control': 'private, max-age=60' // 1 minute client cache
-          }
-        });
-      }
-    }
-    
     const summary = {
       userId: userId.substring(0, 8) + '...',
       hasPreferences: !!preferences,
@@ -302,7 +285,7 @@ export const GET = withErrorHandling(
       savedPrompts: savedPrompts || []
     };
 
-    // Return response with proper caching headers
+    // Decrypted per-user data: never let the browser reuse it for whoever signs in next
     return new NextResponse(JSON.stringify({
       success: true,
       data: responseData
@@ -310,9 +293,7 @@ export const GET = withErrorHandling(
       status: 200,
       headers: {
         'Content-Type': 'application/json',
-        'Last-Modified': lastModified.toUTCString(),
-        'Cache-Control': 'private, max-age=60', // 1 minute client cache
-        'ETag': `"${lastModified.getTime()}-${totalChats}-${folders.length}"`
+        'Cache-Control': 'no-store'
       }
     });
   })

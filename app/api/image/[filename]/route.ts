@@ -9,8 +9,8 @@ export async function GET(
   try {
     const { filename } = await params;
     
-    if (!filename) {
-      return NextResponse.json({ error: 'Filename is required' }, { status: 400 });
+    if (!filename || !/^[A-Za-z0-9_-][A-Za-z0-9._-]*$/.test(filename) || filename.includes('..')) {
+      return NextResponse.json({ error: 'Invalid filename' }, { status: 400 });
     }
 
     if (!imgEndpoint || !imgApiKey) {
@@ -18,7 +18,7 @@ export async function GET(
     }
 
     // Fetch image from private middleware
-    const imageUrl = `${imgEndpoint}/upload/${filename}`;
+    const imageUrl = `${imgEndpoint}/upload/${encodeURIComponent(filename)}`;
     const response = await fetch(imageUrl, {
       headers: {
         'Authorization': `Bearer ${imgApiKey}`,
