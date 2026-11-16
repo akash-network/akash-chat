@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
-import { Message } from 'ai';
+import type { ChatMessage as Message } from '@/lib/utils';
 import { safeSetItem } from '@/lib/local-storage-manager';
 
 function generateUUID(): string {

@@ -1,4 +1,4 @@
-import { Message as AIMessage } from 'ai';
+import type { ChatMessage as AIMessage } from '@/lib/utils';
 import { motion } from 'framer-motion';
 import { Copy, ChevronDown, LoaderCircle, Download, GitBranch, Check } from 'lucide-react';
 import { memo, useState, useEffect } from 'react';

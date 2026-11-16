@@ -9,8 +9,8 @@
     "seed-models": "tsx scripts/seed-models.ts"
   },
   "dependencies": {
-    "@ai-sdk/openai": "^1.3.24",
-    "@ai-sdk/react": "^1.2.12",
+    "@ai-sdk/openai": "^4.0.111",
+    "@ai-sdk/react": "^4.0.170",
     "@auth0/nextjs-auth0": "^3.8.0",
     "@next/third-parties": "^15.5.29",
     "@radix-ui/react-dialog": "^1.3.1",
@@ -20,7 +20,7 @@
     "@radix-ui/react-tooltip": "^1.4.1",
     "@types/pg": "^8.23.1",
     "@types/react-syntax-highlighter": "^15.5.13",
-    "ai": "^4.3.19",
+    "ai": "^7.0.166",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "framer-motion": "^11.18.2",
@@ -49,7 +49,7 @@
     "tiktoken": "^1.0.22",
     "unified": "^11.0.5",
     "usehooks-ts": "^3.1.1",
-    "zod": "^3.25.76"
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.20",

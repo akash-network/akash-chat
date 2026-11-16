@@ -1,4 +1,4 @@
-import { Message } from 'ai';
+import type { ChatMessage as Message } from '@/lib/utils';
 import { useState } from 'react';
 import { useDrag } from 'react-dnd';
 

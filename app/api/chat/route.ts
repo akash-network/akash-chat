@@ -1,5 +1,5 @@
 import { createOpenAI } from '@ai-sdk/openai';
-import { streamText, createDataStreamResponse, generateText, simulateReadableStream, Message } from 'ai';
+import { streamText, generateText, createUIMessageStream, createUIMessageStreamResponse, toUIMessageStream, isTextUIPart, type UIMessage } from 'ai';
 import { NextRequest } from 'next/server';
 import cl100k_base from "tiktoken/encoders/cl100k_base.json";
 import { Tiktoken } from "tiktoken/lite";
@@ -18,6 +18,11 @@ if (!apiKey) {
 // Text averages ~4 characters per token, so anything longer than this can't fit the model and isn't worth tokenizing
 const MAX_CHARS_PER_TOKEN = 6;
 
+interface TextMessage {
+  role: 'user' | 'assistant';
+  content: string;
+}
+
 // BPE cost grows quadratically with the length of an unbroken run of letters, so count in fixed-size chunks
 function countTokens(encoding: Tiktoken, text: string): number {
   let count = 0;
@@ -31,7 +36,6 @@ function createOpenAIWithRateLimit(apiKey: string) {
   return createOpenAI({
     baseURL: apiEndpoint,
     apiKey: apiKey,
-    compatibility: 'compatible',
     // Inject reasoning content into the stream
     fetch: async (url, options) => {
       // Inject required kwargs for DeepSeek V3.1 to enable thinking. Workaround for old ai sdk version.
@@ -155,13 +159,12 @@ async function handlePostRequest(req: NextRequest) {
 
   const body = await req.json();
   const { system, context } = body;
-  // Only forward plain text turns; extra fields such as experimental_attachments make the AI SDK fetch URLs server-side
-  const messages: Message[] = (Array.isArray(body.messages) ? body.messages : [])
-    .filter((m: any) => (m?.role === 'user' || m?.role === 'assistant') && typeof m.content === 'string')
-    .map((m: any) => ({
-      id: typeof m.id === 'string' ? m.id : Math.random().toString(36).substring(2, 15),
+  // Only forward the text of user and assistant turns; file parts would make the AI SDK fetch URLs server-side
+  const messages: TextMessage[] = (Array.isArray(body.messages) ? body.messages : [])
+    .filter((m: UIMessage) => (m?.role === 'user' || m?.role === 'assistant') && Array.isArray(m.parts))
+    .map((m: UIMessage) => ({
       role: m.role,
-      content: m.content,
+      content: m.parts.filter(isTextUIPart).map(part => part.text).join(''),
     }));
 
   if (messages.length === 0) {
@@ -222,7 +225,7 @@ async function handlePostRequest(req: NextRequest) {
   );
 
   let tokenCount = countTokens(encoding, systemPrompt);
-  let messagesToSend: Message[] = [];
+  let messagesToSend: TextMessage[] = [];
 
   if (context) {
     for (const file of context) {
@@ -276,7 +279,6 @@ async function handlePostRequest(req: NextRequest) {
   if (context) {
     for (const file of context) {
       messagesToSend.unshift({
-        id: Math.random().toString(36).substring(2, 15),
         role: 'user',
         content: `This is the content of the file ${file.name}: ${file.content}`
       });
@@ -301,9 +303,9 @@ async function handlePostRequest(req: NextRequest) {
     try {
       const smallModelId = imgGenFnModel || 'Meta-Llama-3-3-70B-Instruct';
       const smallResponse = await generateText({
-        model: openaiClient(smallModelId),
+        model: openaiClient.chat(smallModelId),
         messages: messagesToSend.slice(-3),
-        system: "Always enhance the user's image request by creating a descriptive image prompt in order to generate a detailed, high-quality image with Stable Diffusion 3.5. Only use the generateImage tool if the user asks for an image. To decide if the user asked for an image, messages but focus on the last one. When asked to generate images, you will use the generateImage tool.",
+        instructions: "Always enhance the user's image request by creating a descriptive image prompt in order to generate a detailed, high-quality image with Stable Diffusion 3.5. Only use the generateImage tool if the user asks for an image. To decide if the user asked for an image, messages but focus on the last one. When asked to generate images, you will use the generateImage tool.",
         tools: {
           generateImage: generateImageTool
         },
@@ -312,7 +314,7 @@ async function handlePostRequest(req: NextRequest) {
       });
 
       if (shouldApplyRateLimit && rateLimitIdentifier && smallResponse.usage) {
-        const totalTokens = (smallResponse.usage.promptTokens || 0) + (smallResponse.usage.completionTokens || 0);
+        const totalTokens = (smallResponse.usage.inputTokens ?? 0) + (smallResponse.usage.outputTokens ?? 0);
         if (totalTokens > 0) {
           try {
             const userId = isAuthenticated && session?.user?.sub ? session.user.sub : null;
@@ -324,29 +326,24 @@ async function handlePostRequest(req: NextRequest) {
         }
       }
 
-      const imageCall = smallResponse.toolCalls.find(call => call.toolName === 'generateImage');
+      // Calls that fail validation come back as dynamic tool calls with unvalidated input, so only accept a typed one
+      const imageCall = smallResponse.toolCalls.find(call => call.toolName === 'generateImage' && !call.dynamic);
 
-      if (imageCall) {
-        const imageResult = await startImageGeneration(imageCall.args);
+      if (imageCall && !imageCall.dynamic) {
+        const imageResult = await startImageGeneration(imageCall.input);
+        const imageTag = `<image_generation> jobId='${imageResult.jobId}' prompt='${String(imageResult.prompt).replace(/'/g, "\\'")}' negative='${String(imageResult.negative || '').replace(/'/g, "\\'")}'</image_generation>`;
 
-        return new Response(
-          simulateReadableStream({
-            initialDelayInMs: 0, // Delay before the first chunk
-            chunkDelayInMs: 0, // Delay between chunks
-            chunks: [
-              `0:"<image_generation> jobId='${imageResult.jobId}' prompt='${String(imageResult.prompt).replace(/'/g, "\\'")}' negative='${String(imageResult.negative || '').replace(/'/g, "\\'")}'</image_generation>"\n`,
-              `e:{"finishReason":"stop","usage":{"promptTokens":20,"completionTokens":50},"isContinued":false}\n`,
-              `d:{"finishReason":"stop","usage":{"promptTokens":20,"completionTokens":50}}\n`,
-            ],
-          }).pipeThrough(new TextEncoderStream()),
-          {
-            status: 200,
-            headers: {
-              'X-Vercel-AI-Data-Stream': 'v1',
-              'Content-Type': 'text/plain; charset=utf-8',
+        return createUIMessageStreamResponse({
+          stream: createUIMessageStream({
+            execute: ({ writer }) => {
+              writer.write({ type: 'start' });
+              writer.write({ type: 'text-start', id: 'image' });
+              writer.write({ type: 'text-delta', id: 'image', delta: imageTag });
+              writer.write({ type: 'text-end', id: 'image' });
+              writer.write({ type: 'finish', finishReason: 'stop' });
             },
-          },
-        );
+          }),
+        });
       }
 
       model = 'Meta-Llama-3-3-70B-Instruct';
@@ -366,53 +363,52 @@ async function handlePostRequest(req: NextRequest) {
     }
   }
 
-  return createDataStreamResponse({
-    execute: async dataStream => {
-      const apiModelId = dbModel.api_id || dbModel.model_id || defaultModel;
+  const apiModelId = dbModel.api_id || dbModel.model_id || defaultModel;
 
-      const result = streamText({
-        model: openaiClient(apiModelId),
-        messages: messagesToSend,
-        system: system || DEFAULT_SYSTEM_PROMPT,
-        temperature: temperature || selectedModel?.temperature,
-        topP: topP || selectedModel?.top_p,
+  const result = streamText({
+    model: openaiClient.chat(apiModelId),
+    messages: messagesToSend,
+    instructions: system || DEFAULT_SYSTEM_PROMPT,
+    temperature: temperature || selectedModel?.temperature,
+    topP: topP || selectedModel?.top_p,
+  });
 
-      });
-
-      Promise.all([result.usage, result.text]).then(async ([usage, text]) => {
-        if (shouldApplyRateLimit && rateLimitIdentifier) {
-          const reportedTokens = (usage?.promptTokens || 0) + (usage?.completionTokens || 0);
-          // Upstreams that don't send usage while streaming report NaN, so fall back to the local prompt count plus an estimate for the reply
-          const totalTokens = reportedTokens > 0 ? reportedTokens : tokenCount + Math.ceil(text.length / 4);
-          try {
-            const userId = isAuthenticated && session?.user?.sub ? session.user.sub : null;
-            const rateLimitConfig = await getRateLimitConfigForUser(userId);
-            await incrementTokenUsageWithMultiplier(rateLimitIdentifier, totalTokens, model, rateLimitConfig);
-          } catch (error) {
-            console.error('Failed to track token usage:', error);
-          }
-        }
-      }).catch(error => {
-        console.error('Failed to get usage data:', error);
-      });
-      
-      result.mergeIntoDataStream(dataStream);
-    },
-    onError: error => {
-      if (error instanceof Error) {
-        if (error.name === 'OpenAIError') {
-          if (error.message.includes('Rate limit')) {
-            return 'Rate limit exceeded. Please try again later.';
-          } else if (error.message.includes('Invalid API key')) {
-            return 'Authentication failed. Please check your API key.';
-          } else if (error.message.includes('context length')) {
-            return 'The conversation is too long. Please start a new chat.';
-          }
-        }
-        return error.message;
+  Promise.all([result.usage, result.text]).then(async ([usage, text]) => {
+    if (shouldApplyRateLimit && rateLimitIdentifier) {
+      const reportedTokens = (usage?.inputTokens ?? 0) + (usage?.outputTokens ?? 0);
+      // Upstreams that don't send usage while streaming leave it empty, so fall back to the local prompt count plus an estimate for the reply
+      const totalTokens = reportedTokens > 0 ? reportedTokens : tokenCount + Math.ceil(text.length / 4);
+      try {
+        const userId = isAuthenticated && session?.user?.sub ? session.user.sub : null;
+        const rateLimitConfig = await getRateLimitConfigForUser(userId);
+        await incrementTokenUsageWithMultiplier(rateLimitIdentifier, totalTokens, model, rateLimitConfig);
+      } catch (error) {
+        console.error('Failed to track token usage:', error);
       }
-      return String(error);
     }
+  }).catch(error => {
+    console.error('Failed to get usage data:', error);
+  });
+
+  return createUIMessageStreamResponse({
+    stream: toUIMessageStream({
+      stream: result.stream,
+      onError: error => {
+        if (error instanceof Error) {
+          if (error.name === 'OpenAIError') {
+            if (error.message.includes('Rate limit')) {
+              return 'Rate limit exceeded. Please try again later.';
+            } else if (error.message.includes('Invalid API key')) {
+              return 'Authentication failed. Please check your API key.';
+            } else if (error.message.includes('context length')) {
+              return 'The conversation is too long. Please start a new chat.';
+            }
+          }
+          return error.message;
+        }
+        return String(error);
+      },
+    }),
   });
 }
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { Message as AIMessage } from 'ai';
+import type { ChatMessage as AIMessage } from '@/lib/utils';
 import { AlertCircle, LoaderCircle } from 'lucide-react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';

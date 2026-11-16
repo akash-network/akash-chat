@@ -1,12 +1,20 @@
-import type { Message as AIMessage } from 'ai';
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
+
+// The UI, local storage and database keep this flat message shape; ChatContext and the chat route
+// convert to and from the AI SDK's parts-based UIMessage
+export interface ChatMessage {
+  id: string;
+  role: 'system' | 'user' | 'assistant';
+  content: string;
+  createdAt?: Date;
+}
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export const processMessages = (messages: AIMessage[]): AIMessage[] => {
+export const processMessages = (messages: ChatMessage[]): ChatMessage[] => {
   return messages.map((msg, index) => {
     if (index === messages.length - 1 && msg.role === 'assistant') {
       return msg;

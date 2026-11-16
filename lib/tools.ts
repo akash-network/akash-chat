@@ -12,7 +12,7 @@ const generateImageParameters = z.object({
 // No execute: the chat route starts at most one image job per request itself
 export const generateImageTool = tool({
     description: 'Generate an image based on a text prompt',
-    parameters: generateImageParameters,
+    inputSchema: generateImageParameters,
 });
 
 export async function startImageGeneration({ prompt, negative }: z.infer<typeof generateImageParameters>) {
