@@ -1,6 +1,6 @@
 # ---- Base Node ----
 FROM node:22-alpine AS base
-RUN corepack enable && corepack prepare pnpm@11.1.0 --activate
+RUN corepack enable && corepack prepare pnpm@11.26.0 --activate
 WORKDIR /app
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 # ---- Dependencies ----
@@ -19,7 +19,7 @@ ENV NEXT_PUBLIC_VERSION=${NEXT_PUBLIC_VERSION}
 RUN pnpm run build
 # ---- Production ----
 FROM node:22-alpine AS production
-RUN corepack enable && corepack prepare pnpm@11.1.0 --activate
+RUN corepack enable && corepack prepare pnpm@11.26.0 --activate
 WORKDIR /app
 COPY --from=dependencies /app/node_modules ./node_modules
 COPY --from=build /app/.next ./.next
