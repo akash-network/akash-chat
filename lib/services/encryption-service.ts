@@ -12,37 +12,44 @@ export interface ClientEncryptedData {
   tag: string;
 }
 
+const MAX_CACHED_KEYS = 1000;
+
+// Shared across instances: the name helpers below create a new service per call, and each
+// derivation is a synchronous 100k-iteration PBKDF2 that blocks the event loop
+const derivedKeyCache = new Map<string, Buffer>();
+
 /**
  * Centralized encryption service for consistent data handling
  */
 export class EncryptionService {
   private masterKey: string;
-  private pbkdf2CallCount = 0;
-  private derivedKeyCache: Map<string, Buffer>;
 
   constructor(userId: string) {
     this.masterKey = generateUserMasterKey(userId);
-    this.derivedKeyCache = new Map();
   }
 
   /**
    * Get or derive encryption key with caching
    */
   private getDerivedKey(salt: Buffer): Buffer {
-    const saltKey = salt.toString('base64');
+    const cacheKey = `${this.masterKey}:${salt.toString('base64')}`;
 
     // Check cache first
-    if (this.derivedKeyCache.has(saltKey)) {
-      return this.derivedKeyCache.get(saltKey)!;
+    const cached = derivedKeyCache.get(cacheKey);
+    if (cached) {
+      return cached;
     }
 
     // Cache miss - derive the key
     const crypto = require('crypto');
     const key = crypto.pbkdf2Sync(this.masterKey, salt, 100000, 32, 'sha512');
-    this.pbkdf2CallCount++;
 
-    // Cache the derived key
-    this.derivedKeyCache.set(saltKey, key);
+    // Cache the derived key, evicting the oldest entry once full
+    const oldestKey = derivedKeyCache.keys().next().value;
+    if (derivedKeyCache.size >= MAX_CACHED_KEYS && oldestKey !== undefined) {
+      derivedKeyCache.delete(oldestKey);
+    }
+    derivedKeyCache.set(cacheKey, key);
 
     return key;
   }

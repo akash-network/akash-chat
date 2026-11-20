@@ -6,9 +6,11 @@ import { useState, useEffect } from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { 
   loadUserDataFromDatabase, 
-  applyDataToLocalStorage, 
+  applyDataToLocalStorage,
   hasLocalDataToSync,
   hasDataInDatabase,
+  cleanupStaleAccountData,
+  markAccountDataOwner,
   type UserData
 } from '@/lib/data-sync';
 
@@ -146,8 +148,15 @@ export function useDatabaseSync(options: UseDatabaseSyncOptions = {}): UseDataba
     if (isAuthLoading) {
       return; // Wait for auth to load
     }
-    
+
+    if (cleanupStaleAccountData(user?.sub)) {
+      window.location.reload();
+      return;
+    }
+
     if (user?.sub) {
+      markAccountDataOwner(user.sub);
+
       // Prevent duplicate syncs for the same user
       if (lastSyncedUserId === user.sub) {
         return;

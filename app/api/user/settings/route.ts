@@ -14,6 +14,9 @@ import {
 import { requireAuth } from '@/lib/middleware/auth';
 import { withErrorHandling, createSuccessResponse, validateRequestBody, ValidationError } from '@/lib/middleware/error-handler';
 
+// Each prompt is a separate encrypt + write, so bound the work a single request can queue
+const MAX_PROMPTS_PER_REQUEST = 500;
+
 export const GET = withErrorHandling(
   requireAuth(async (_request: NextRequest, userId: string, _user: any) => {
     const [preferences, savedPrompts] = await Promise.all([
@@ -38,6 +41,9 @@ export const POST = withErrorHandling(
 
     switch (action) {
       case 'sync_to_database':
+        if (Array.isArray(data?.localStorageData?.savedPrompts) && data.localStorageData.savedPrompts.length > MAX_PROMPTS_PER_REQUEST) {
+          throw new ValidationError(`At most ${MAX_PROMPTS_PER_REQUEST} prompts can be synced per request`);
+        }
         await syncUserSettingsToDatabase(userId, data?.localStorageData);
         return createSuccessResponse({ message: 'Settings synced to database' });
 
@@ -84,6 +90,9 @@ export const POST = withErrorHandling(
       case 'reorder_prompts':
         if (!data?.promptIds || !Array.isArray(data.promptIds)) {
           throw new ValidationError('Prompt IDs array is required');
+        }
+        if (data.promptIds.length > MAX_PROMPTS_PER_REQUEST) {
+          throw new ValidationError(`At most ${MAX_PROMPTS_PER_REQUEST} prompts can be reordered per request`);
         }
         await reorderEncryptedPrompts(userId, data.promptIds);
         return createSuccessResponse({ message: 'Prompts reordered' });

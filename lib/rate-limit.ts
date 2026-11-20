@@ -204,33 +204,22 @@ export async function incrementTokenUsage(
   const timestampKey = `${config.keyPrefix}${identifier}:start`;
 
   try {
-    // Check if this is the first request for this IP
-    const pipeline = redis.pipeline();
-    pipeline.get(tokenKey);
-    pipeline.get(timestampKey);
-
-    const results = await pipeline.exec();
-    if (!results || results.length !== 2) {
-      throw new Error('Redis pipeline failed');
+    // Start the window only if none exists, then add atomically so concurrent requests can't overwrite each other
+    const results = await redis
+      .multi()
+      .set(timestampKey, now.toString(), 'PX', config.windowMs, 'NX')
+      .incrby(tokenKey, tokenCount)
+      .get(timestampKey)
+      .exec();
+    if (!results || results.length !== 3) {
+      throw new Error('Redis transaction failed');
     }
 
-    const currentTokens = parseInt((results[0][1] as string) || '0');
-    let windowStartTime = parseInt((results[1][1] as string) || '0');
-
-    if (!windowStartTime) {
-      windowStartTime = now;
-    }
-
-    const used = currentTokens + tokenCount;
+    const used = Number(results[1][1]);
+    const windowStartTime = parseInt((results[2][1] as string) || now.toString());
     const resetTime = new Date(windowStartTime + config.windowMs);
-    const ttlSeconds = Math.ceil((resetTime.getTime() - now) / 1000);
 
-    // Update both token count and start time with same TTL
-    const updatePipeline = redis.pipeline();
-    updatePipeline.setex(tokenKey, ttlSeconds, used.toString());
-    updatePipeline.setex(timestampKey, ttlSeconds, windowStartTime.toString());
-
-    await updatePipeline.exec();
+    await redis.pexpireat(tokenKey, resetTime.getTime());
 
     const rateLimit: RateLimit = {
       limit: config.maxTokens,
@@ -371,21 +360,29 @@ export async function getConversationTokens(identifier: string): Promise<{
 }
 
 /**
+ * Remove a port from "1.2.3.4:5678" or "[2001:db8::1]:5678"; bare IPv6 addresses are returned unchanged
+ */
+function stripPort(ip: string): string {
+  const bracketed = ip.match(/^\[([^\]]+)\](?::\d+)?$/);
+  if (bracketed) {
+    return bracketed[1];
+  }
+  const ipv4WithPort = ip.match(/^(\d{1,3}(?:\.\d{1,3}){3}):\d+$/);
+  return ipv4WithPort ? ipv4WithPort[1] : ip;
+}
+
+/**
  * Get client IP address from request headers
  */
 export function getClientIP(request: Request): string {
   // Only use the reliable X-Original-Chat-Forwarded-For header set by Caddy
   const originalChatForwarded = request.headers.get('X-Original-Chat-Forwarded-For');
   const cloudflareForwarded = request.headers.get('CF-Connecting-IP');
-  
+
   if (originalChatForwarded) {
-    const ip = originalChatForwarded.split(',')[0].trim();
-    // Remove port if present (e.g., "162.158.172.8:59694" -> "162.158.172.8")
-    return ip.split(':')[0];
+    return stripPort(originalChatForwarded.split(',')[0].trim());
   } else if (cloudflareForwarded) {
-    const ip = cloudflareForwarded.split(',')[0].trim();
-    // Remove port if present (e.g., "162.158.172.8:59694" -> "162.158.172.8")
-    return ip.split(':')[0];
+    return stripPort(cloudflareForwarded.split(',')[0].trim());
   }
   
   // Consistent fallback to prevent rate limit resets

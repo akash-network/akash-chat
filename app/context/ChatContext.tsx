@@ -2,8 +2,8 @@
 
 import { useChat } from '@ai-sdk/react'
 import { useUser } from '@auth0/nextjs-auth0/client';
-import type { Message as AIMessage } from 'ai';
-import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
+import { DefaultChatTransport, isTextUIPart, type UIMessage } from 'ai';
+import React, { createContext, useContext, useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useWindowSize } from 'usehooks-ts';
 
 import { DEFAULT_SYSTEM_PROMPT } from '@/app/config/api';
@@ -16,7 +16,7 @@ import { useEncryptedSettings, UserPreferences } from '@/hooks/use-encrypted-set
 import { Folder, useFolders } from '@/hooks/use-folders';
 import { useRateLimit } from '@/hooks/use-rate-limit';
 import { safeSetItem } from '@/lib/local-storage-manager';
-import { validateAccessToken, processMessages } from '@/lib/utils';
+import { validateAccessToken, processMessages, type ChatMessage as AIMessage } from '@/lib/utils';
 
 const SELECTED_MODEL_KEY = 'selectedModel';
 const CURRENT_SYSTEM_PROMPT_KEY = 'currentSystemPrompt';
@@ -317,45 +317,45 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [userPreferences?.selected_model, userPreferences]);
   
   // AI chat hook
+  const [input, setInput] = useState('');
+  // UIMessage carries no timestamp, so remember when each message was first seen
+  const messageCreatedAt = useRef(new Map<string, Date>());
+  const chatTransport = useMemo(() => new DefaultChatTransport({ api: '/api/chat/' }), []);
+
+  const toChatMessages = useCallback((uiMessages: UIMessage[]): AIMessage[] => uiMessages.map(message => {
+    if (!messageCreatedAt.current.has(message.id)) {
+      messageCreatedAt.current.set(message.id, new Date());
+    }
+    return {
+      id: message.id,
+      role: message.role,
+      content: message.parts.filter(isTextUIPart).map(part => part.text).join(''),
+      createdAt: messageCreatedAt.current.get(message.id),
+    };
+  }), []);
+
   const {
-    messages,
-    input,
-    handleInputChange,
-    handleSubmit: originalHandleSubmit,
-    isLoading,
+    messages: uiMessages,
+    sendMessage,
+    regenerate,
     status,
-    setMessages,
-    setInput,
-    reload,
+    setMessages: setUIMessages,
     stop,
   } = useChat({
-    api: '/api/chat/',
-    experimental_throttle: 250,
-    body: {
-      model: modelSelection,
-      system: systemPrompt,
-      temperature,
-      topP,
-      context: contextFiles.map((f: ContextFile) => ({ 
-        content: f.content,
-        name: f.name,
-        type: f.type,
-      })),
-    },
-    onFinish: async (message: AIMessage) => {
+    transport: chatTransport,
+    throttle: 250,
+    onFinish: async ({ messages: finishedMessages, isAbort, isDisconnect, isError }) => {
+      if (isAbort || isDisconnect || isError) {
+        return;
+      }
+
       setModelError(null);
-      
+
       // Track message success for rate limiting
       await trackMessageSuccess();
-      
-      const newUserMessage: AIMessage = {
-        role: 'user',
-        content: input,
-        id: 'user-message',
-        createdAt: new Date(),
-      }
-      const allMessages = [...messages, newUserMessage, message];
-      
+
+      const allMessages = toChatMessages(finishedMessages);
+
       if (!selectedChat) {
         // New chat - save it (private or regular based on mode)
         const chatId = isPrivateMode 
@@ -375,11 +375,44 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     },
     onError: async (error: Error) => {
       setModelError(error.message);
-      
+
       // Track message failure for rate limiting
       await trackMessageFailure(error);
     },
   });
+
+  const messages = useMemo(() => toChatMessages(uiMessages), [uiMessages, toChatMessages]);
+  const isLoading = status === 'submitted' || status === 'streaming';
+
+  const setMessages = useCallback((chatMessages: AIMessage[]) => {
+    setUIMessages(chatMessages.map(message => {
+      if (message.createdAt) {
+        messageCreatedAt.current.set(message.id, new Date(message.createdAt));
+      }
+      return { id: message.id, role: message.role, parts: [{ type: 'text', text: message.content }] };
+    }));
+  }, [setUIMessages]);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>) => {
+    setInput(e.target.value);
+  };
+
+  // Sent with each request so the server always gets the current model, prompt and files
+  const getRequestBody = () => ({
+    model: modelSelection,
+    system: systemPrompt,
+    temperature,
+    topP,
+    context: contextFiles.map((f: ContextFile) => ({
+      content: f.content,
+      name: f.name,
+      type: f.type,
+    })),
+  });
+
+  const reload = () => {
+    regenerate({ body: getRequestBody() });
+  };
 
   // Save model selection
   useEffect(() => {
@@ -847,8 +880,11 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const processedMessages = processMessages(messages);
     setMessages(processedMessages);
 
-    originalHandleSubmit(e);
-    
+    if (!input) {return;}
+
+    sendMessage({ text: input }, { body: getRequestBody() });
+    setInput('');
+
   };
 
   const handleMessagesSelect = (messages: AIMessage[]) => {

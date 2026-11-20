@@ -4,13 +4,19 @@ import { requireAuth } from '@/lib/middleware/auth';
 import { withErrorHandling, createSuccessResponse, validateRequestBody, ValidationError } from '@/lib/middleware/error-handler';
 import { createDatabaseService } from '@/lib/services/database-service';
 
+const MAX_FOLDERS_PER_BATCH = 100;
+
 export const POST = withErrorHandling(
   requireAuth(async (request: NextRequest, userId: string, _user: any) => {
     // Validate request body
     const { folders } = await validateRequestBody(request, ['folders']);
-    
+
     if (!Array.isArray(folders)) {
       throw new ValidationError('Folders must be an array');
+    }
+
+    if (folders.length > MAX_FOLDERS_PER_BATCH) {
+      throw new ValidationError(`At most ${MAX_FOLDERS_PER_BATCH} folders can be saved per request`);
     }
 
     if (folders.length === 0) {

@@ -1,4 +1,4 @@
-import { Message as AIMessage } from 'ai';
+import type { ChatMessage as AIMessage } from '@/lib/utils';
 import { motion } from 'framer-motion';
 import { Copy, ChevronDown, LoaderCircle, Download, GitBranch, Check } from 'lucide-react';
 import { memo, useState, useEffect } from 'react';
@@ -85,7 +85,7 @@ const ImageGenerationSection = ({ jobId, prompt, negative }: { jobId: string, pr
   useEffect(() => {
     const checkStatus = async () => {
       try {
-        const response = await fetch(`/api/image-status?ids=${jobId}`);
+        const response = await fetch(`/api/image-status?ids=${encodeURIComponent(jobId)}`);
         
         if (response.status === 404) {
           setErrorCount(prev => {

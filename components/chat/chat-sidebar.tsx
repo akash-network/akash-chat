@@ -1,6 +1,6 @@
 'use client';
 
-import { Message } from 'ai';
+import type { ChatMessage as Message } from '@/lib/utils';
 import { AnimatePresence, motion } from 'framer-motion';
 import { FolderPlus, CirclePlus, PanelRightOpen, Heart, Ellipsis, PlugZap, Globe, ChartBarBig, ChartColumnIncreasing, Settings, Package, Keyboard } from 'lucide-react';
 import Link from 'next/link';

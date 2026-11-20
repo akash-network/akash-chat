@@ -5,13 +5,26 @@ import { withErrorHandling, createSuccessResponse, validateRequestBody, Validati
 import { createDatabaseService } from '@/lib/services/database-service';
 import { createEncryptionService } from '@/lib/services/encryption-service';
 
+// Each message is a separate encrypt + insert, so bound the work a single request can queue
+const MAX_CHATS_PER_BATCH = 50;
+const MAX_MESSAGES_PER_BATCH = 2000;
+
 export const POST = withErrorHandling(
   requireAuth(async (request: NextRequest, userId: string, _user: any) => {
     // Validate request body
     const { chats } = await validateRequestBody(request, ['chats']);
-    
+
     if (!Array.isArray(chats)) {
       throw new ValidationError('Chats must be an array');
+    }
+
+    if (chats.length > MAX_CHATS_PER_BATCH) {
+      throw new ValidationError(`At most ${MAX_CHATS_PER_BATCH} chats can be saved per request`);
+    }
+
+    const messageCount = chats.reduce((sum, chat) => sum + (Array.isArray(chat?.messages) ? chat.messages.length : 0), 0);
+    if (messageCount > MAX_MESSAGES_PER_BATCH) {
+      throw new ValidationError(`At most ${MAX_MESSAGES_PER_BATCH} messages can be saved per request`);
     }
 
     if (chats.length === 0) {
